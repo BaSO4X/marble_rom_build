@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<cust_features>
+    <cust_feature>
+        <bool name="support_game_turbo_tool">true</bool>
+        <bool name="cust_feature_legacy_device_7475">true</bool>
+        <bool name="patern2_device">true</bool>
+        <bool name="mishare_support_tapshare">true</bool>
+        <bool name="support_audio_share_ui">true</bool>
+        <bool name="u_show_auracast_profile_phone_list">true</bool>
+        <bool name="u_show_lea_aosp_profile_phone_list">true</bool>
+        <bool name="persist.vendor.bluetooth.lhdc_v5.supported">true</bool>
+        <bool name="persist.vendor.bluetooth.lhdc_v4.supported">true</bool>
+        <bool name="persist.vendor.bluetooth.bqr.supported">true</bool>
+        <bool name="support_virtual_call">true</bool>
+        <bool name="device_on_platform_7475">true</bool>
+        <bool name="input_scroller_optimization_power_support">true</bool>
+        <bool name="ro.system_ext.game.support">true</bool>
+        <string-array name="miui_mtk_perf_boost_config">
+            <item>0x00400000</item>
+            <item>1000000</item>
+            <item>0x00400100</item>
+            <item>1000000</item>
+            <item>0x00c00000</item>
+            <item>39</item>
+        </string-array>
+        <bool name="input_scroller_optimization_normal_support">true</bool>
+    </cust_feature>
+</cust_features>
