@@ -186,41 +186,36 @@ unzip -o "$GITHUB_WORKSPACE/"${device}"_files/"${device}"_kernel.zip" -d "$GITHU
 echo -e "${Red}- 解包 boot.img"
 mkdir -p "$GITHUB_WORKSPACE/boot_unpack"
 cd "$GITHUB_WORKSPACE/boot_unpack"
-"$magiskboot" unpack "$GITHUB_WORKSPACE/"${device}"/firmware-update/boot.img"
-# 注入 OrangeFox Recovery
+"$magiskboot" unpack "$GITHUB_WORKSPACE/${device}/firmware-update/boot.img"
+# 注入 OrangeFox
 echo -e "${Red}- 注入 OrangeFox Recovery (ZIP)"
-OF_ZIP="$GITHUB_WORKSPACE/"${device}"_files/"${device}"_recovery.zip"
+OF_ZIP="$GITHUB_WORKSPACE/${device}_files/${device}_recovery.zip"
 if [ -f "$OF_ZIP" ]; then
-  echo -e "${Yellow}- 解压 OrangeFox zip"
   mkdir -p "$GITHUB_WORKSPACE/of_unpack"
   unzip -o "$OF_ZIP" -d "$GITHUB_WORKSPACE/of_unpack" >/dev/null
-  if [ -f "$GITHUB_WORKSPACE/of_unpack/recovery.img" ]; then
-    echo -e "${Yellow}- 检测到 recovery.img"
+  REC_IMG=$(find "$GITHUB_WORKSPACE/of_unpack" -name recovery.img | head -n1)
+  if [ -f "$REC_IMG" ]; then
+    echo "找到 recovery.img"
     cd "$GITHUB_WORKSPACE/of_unpack"
-    "$magiskboot" unpack recovery.img
-    echo -e "${Yellow}- 替换 ramdisk"
-    rm -f "$GITHUB_WORKSPACE/boot_unpack/ramdisk.cpio"
-    cp ramdisk.cpio "$GITHUB_WORKSPACE/boot_unpack/"
+    "$magiskboot" unpack "$REC_IMG"
+    echo "替换 ramdisk"
+    cd "$GITHUB_WORKSPACE/boot_unpack"
+    rm -f ramdisk*
+    cp "$GITHUB_WORKSPACE/of_unpack"/ramdisk* .
   else
-    echo -e "${Red}- 未识别到有效的 OrangeFox 内容"
+    echo "未找到 recovery.img"
   fi
-  echo -e "${Green}- OrangeFox 注入完成"
-else
-  echo -e "${Yellow}- 未找到 recovery zip，跳过"
 fi
 # 替换 kernel
-echo -e "${Red}- 替换内核 Image / dtb"
-if [ -f "$GITHUB_WORKSPACE/kernel/Image" ]; then
-  mv -f "$GITHUB_WORKSPACE/kernel/Image" kernel
-fi
-# 替换 dtb
-if [ -f "$GITHUB_WORKSPACE/kernel/dtb" ]; then
-  mv -f "$GITHUB_WORKSPACE/kernel/dtb" dtb
-fi
-# 重新打包 boot
+echo -e "${Red}- 替换 kernel"
+cd "$GITHUB_WORKSPACE/boot_unpack"
+[ -f "$GITHUB_WORKSPACE/kernel/Image" ] && cp -f "$GITHUB_WORKSPACE/kernel/Image" kernel
+[ -f "$GITHUB_WORKSPACE/kernel/dtb" ] && cp -f "$GITHUB_WORKSPACE/kernel/dtb" dtb
+# 重新打包
 echo -e "${Red}- 重新打包 boot.img"
-"$magiskboot" repack "$GITHUB_WORKSPACE/"${device}"/firmware-update/boot.img"
-mv -f new-boot.img "$GITHUB_WORKSPACE/"${device}"/firmware-update/boot.img"
+cd "$GITHUB_WORKSPACE/boot_unpack"
+"$magiskboot" repack "$GITHUB_WORKSPACE/${device}/firmware-update/boot.img"
+mv -f new-boot.img "$GITHUB_WORKSPACE/${device}/firmware-update/boot.img"
 # 替换 dtbo
 echo -e "${Red}- 替换 dtbo.img"
 if [ -f "$GITHUB_WORKSPACE/kernel/dtbo.img" ]; then
