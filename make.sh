@@ -187,39 +187,33 @@ echo -e "${Red}- 解包 boot.img"
 mkdir -p "$GITHUB_WORKSPACE/boot_unpack"
 cd "$GITHUB_WORKSPACE/boot_unpack"
 "$magiskboot" unpack "$GITHUB_WORKSPACE/${device}/firmware-update/boot.img"
-# 注入 OrangeFox
-echo -e "${Red}- 注入 OrangeFox Recovery (ZIP)"
-OF_ZIP="$GITHUB_WORKSPACE/${device}_files/${device}_recovery.zip"
-if [ -f "$OF_ZIP" ]; then
-  mkdir -p "$GITHUB_WORKSPACE/of_unpack"
-  unzip -o "$OF_ZIP" -d "$GITHUB_WORKSPACE/of_unpack" >/dev/null
-  REC_IMG=$(find "$GITHUB_WORKSPACE/of_unpack" -name recovery.img | head -n1)
-  if [ -f "$REC_IMG" ]; then
-    echo "找到 recovery.img"
-    cd "$GITHUB_WORKSPACE/of_unpack"
-    "$magiskboot" unpack "$REC_IMG"
-    echo "替换 ramdisk"
-    cd "$GITHUB_WORKSPACE/boot_unpack"
-    rm -f ramdisk*
-    cp "$GITHUB_WORKSPACE/of_unpack"/ramdisk* .
-  else
-    echo "未找到 recovery.img"
-  fi
-fi
+# 解包 vendor_boot
+echo -e "${Red}- 解包 vendor_boot.img"
+mkdir -p "$GITHUB_WORKSPACE/vendor_boot_unpack"
+cd "$GITHUB_WORKSPACE/vendor_boot_unpack"
+"$magiskboot" unpack "$GITHUB_WORKSPACE/${device}/firmware-update/vendor_boot.img"
 # 替换 kernel
 echo -e "${Red}- 替换 kernel"
 cd "$GITHUB_WORKSPACE/boot_unpack"
 [ -f "$GITHUB_WORKSPACE/kernel/Image" ] && cp -f "$GITHUB_WORKSPACE/kernel/Image" kernel
+# 替换 dtb
+echo -e "${Red}- 替换 dtb"
+cd "$GITHUB_WORKSPACE/vendor_boot_unpack"
 [ -f "$GITHUB_WORKSPACE/kernel/dtb" ] && cp -f "$GITHUB_WORKSPACE/kernel/dtb" dtb
-# 重新打包
+# 重新打包 boot.img
 echo -e "${Red}- 重新打包 boot.img"
 cd "$GITHUB_WORKSPACE/boot_unpack"
 "$magiskboot" repack "$GITHUB_WORKSPACE/${device}/firmware-update/boot.img"
 mv -f new-boot.img "$GITHUB_WORKSPACE/${device}/firmware-update/boot.img"
+# 重新打包 vendor_boot.img
+echo -e "${Red}- 重新打包 vendor_boot.img"
+cd "$GITHUB_WORKSPACE/vendor_boot_unpack"
+"$magiskboot" repack "$GITHUB_WORKSPACE/${device}/firmware-update/vendor_boot.img"
+mv -f new-boot.img "$GITHUB_WORKSPACE/${device}/firmware-update/vendor_boot.img"
 # 替换 dtbo
 echo -e "${Red}- 替换 dtbo.img"
 if [ -f "$GITHUB_WORKSPACE/kernel/dtbo.img" ]; then
-  cp -f "$GITHUB_WORKSPACE/kernel/dtbo.img" "$GITHUB_WORKSPACE/"${device}"/firmware-update/dtbo.img"
+  cp -f "$GITHUB_WORKSPACE/kernel/dtbo.img" "$GITHUB_WORKSPACE/${device}/firmware-update/dtbo.img"
 fi
 # 替换 Overlay 叠加层
 echo -e "${Red}- 替换 Overlay 叠加层"
