@@ -302,25 +302,25 @@ for app in "${apps[@]}"; do
     sudo rm -rf "$appsui"
   fi
 done
-# 分辨率修复
-echo -e "${Red}- 分辨率统一修改 (440)"
-sudo find "$GITHUB_WORKSPACE/images/" -type f -name 'build.prop' | while read -r file; do
-  echo -e "${Yellow}- 处理文件: $file"
-  # 删除 sec_density
-  sed -i '/ro\.sf\.lcd_sec_density/d' "$file"
-  # 统一 ro.sf.lcd_density
-  if grep -q "^ro.sf.lcd_density=" "$file"; then
-    sed -i 's/^ro.sf.lcd_density=.*/ro.sf.lcd_density=440/' "$file"
+# 分辨率修改
+echo -e "${Red}- 分辨率修改"
+Find_character() {
+  FIND_FILE="$1"
+  FIND_STR="$2"
+  if [ $(grep -c "$FIND_STR" $FIND_FILE) -ne '0' ]; then
+    Character_present=true
+    echo -e "${Yellow}- 找到指定字符: $2"
   else
-    echo "ro.sf.lcd_density=440" >> "$file"
+    Character_present=false
+    echo -e "${Yellow}- !未找到指定字符: $2"
   fi
-  # 统一 persist.miui.density_v2
-  if grep -q "^persist.miui.density_v2=" "$file"; then
-    sed -i 's/^persist.miui.density_v2=.*/persist.miui.density_v2=440/' "$file"
-  else
-    echo "persist.miui.density_v2=440" >> "$file"
-  fi
-done
+}
+Find_character "$GITHUB_WORKSPACE"/images/product/etc/build.prop persist.miui.density_v2
+if [[ $Character_present == true ]]; then
+  sudo sed -i 's/persist.miui.density_v2=[^*]*/persist.miui.density_v2=440/' "$GITHUB_WORKSPACE"/images/product/etc/build.prop
+else
+  sudo sed -i ''"$(sudo sed -n '/ro.miui.notch/=' "$GITHUB_WORKSPACE"/images/product/etc/build.prop)"'a persist.miui.density_v2=440' "$GITHUB_WORKSPACE"/images/product/etc/build.prop
+fi
 # Millet 修复
 echo -e "${Red}- Millet 修复"
 Find_character "$GITHUB_WORKSPACE"/images/product/etc/build.prop ro.millet.netlink
@@ -370,6 +370,14 @@ if [[ "${DECRYPTION}" == "true" ]]; then
     sed -i "/persist.sys.stability.gcImproveEnable.808/d" "$build_prop"
   done
 fi
+# 分辨率修复
+echo -e "${Red}- 修复分辨率异常"
+sudo find "$GITHUB_WORKSPACE"/images/ -type f -name 'build.prop' | while read -r file; do
+  if grep -qE "ro.sf.lcd_density|ro.sf.lcd_sec_density" "$file"; then
+    echo -e "${Yellow}- 找到文件: $file"
+    sed -i -e '/ro\.sf\.lcd_density/d' -e '/ro\.sf\.lcd_sec_density/d' "$file"
+  fi
+done
 # 精简无用配置
 echo -e "${Red}- 精简无用配置"
 keywords=("thermal.iec")
