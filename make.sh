@@ -317,9 +317,9 @@ Find_character() {
 }
 Find_character "$GITHUB_WORKSPACE"/images/product/etc/build.prop persist.miui.density_v2
 if [[ $Character_present == true ]]; then
-  sudo sed -i 's/persist.miui.density_v2=[^*]*/persist.miui.density_v2=480/' "$GITHUB_WORKSPACE"/images/product/etc/build.prop
+  sudo sed -i 's/persist.miui.density_v2=[^*]*/persist.miui.density_v2=440/' "$GITHUB_WORKSPACE"/images/product/etc/build.prop
 else
-  sudo sed -i ''"$(sudo sed -n '/ro.miui.notch/=' "$GITHUB_WORKSPACE"/images/product/etc/build.prop)"'a persist.miui.density_v2=480' "$GITHUB_WORKSPACE"/images/product/etc/build.prop
+  sudo sed -i ''"$(sudo sed -n '/ro.miui.notch/=' "$GITHUB_WORKSPACE"/images/product/etc/build.prop)"'a persist.miui.density_v2=440' "$GITHUB_WORKSPACE"/images/product/etc/build.prop
 fi
 # Millet 修复
 echo -e "${Red}- Millet 修复"
