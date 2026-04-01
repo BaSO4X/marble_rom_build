@@ -379,9 +379,6 @@ sudo find "$GITHUB_WORKSPACE"/images/ -type f -name 'build.prop' | while read -r
   # 如果存在 lcd_density 就替换，不存在就追加
   if grep -q '^ro\.sf\.lcd_density=' "$file"; then
     sed -i 's/^ro\.sf\.lcd_density=.*/ro.sf.lcd_density=440/' "$file"
-  else
-    echo 'ro.sf.lcd_density=440' >> "$file"
-  fi
 done
 # 精简无用配置
 echo -e "${Red}- 精简无用配置"
