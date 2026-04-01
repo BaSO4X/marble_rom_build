@@ -373,10 +373,9 @@ fi
 # 分辨率修复
 echo -e "${Red}- 修复分辨率异常"
 sudo find "$GITHUB_WORKSPACE"/images/ -type f -name 'build.prop' | while read -r file; do
-  grep -q "ro.sf.lcd_sec_density" "$file"
-  if [ $? -eq 0 ]; then
+  if grep -qE "ro.sf.lcd_density|ro.sf.lcd_sec_density" "$file"; then
     echo -e "${Yellow}- 找到文件: $file"
-    sed -i '/ro.sf.lcd_sec_density/d' "$file"
+    sed -i -e '/ro\.sf\.lcd_density/d' -e '/ro\.sf\.lcd_sec_density/d' "$file"
   fi
 done
 # 精简无用配置
