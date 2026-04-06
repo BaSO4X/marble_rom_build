@@ -153,6 +153,11 @@ echo "vendor_base_line=$vendor_base_line" >>$GITHUB_ENV
 ### 功能修复
 echo -e "${Red}- 开始功能修复"
 Start_Time
+# 去除 AVB2.0 校验
+echo -e "${Red}- 去除 AVB2.0 校验"
+"$GITHUB_WORKSPACE"/tools/vbmeta-disable-verification "$GITHUB_WORKSPACE"/"${device}"/firmware-update/vbmeta.img
+
+Start_Time
 
 End_Time 功能修复
 ### 功能修复结束
