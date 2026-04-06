@@ -192,15 +192,15 @@ partitions=("mi_ext" "odm" "product" "system" "system_ext" "vendor" "vendor_dlkm
   --partition vendor_a:readonly:"$vendor_size":qti_dynamic_partitions_a \
   --image vendor_a="$GITHUB_WORKSPACE"/images/vendor.img \
   --partition vendor_b:readonly:0:qti_dynamic_partitions_b \
-  --partition vendor_dlkm_a:readonly:"$mi_ext_size":qti_dynamic_partitions_a \
-  --image vendor_dlkm_a="$GITHUB_WORKSPACE"/images/mi_ext.img \
+  --partition vendor_dlkm_a:readonly:"$vendor_dlkm_size":qti_dynamic_partitions_a \
+  --image vendor_dlkm_a="$GITHUB_WORKSPACE"/images/vendor_dlkm.img \  
   --partition vendor_dlkm_b:readonly:0:qti_dynamic_partitions_b \
   --device super:9126805504 \
   --metadata-slots 3 \
   --group qti_dynamic_partitions_a:9126805504 \
   --group qti_dynamic_partitions_b:9126805504 \
   --virtual-ab -F \
-  --output "$GITHUB_WORKSPACE"/images/super.img
+  --output "$GITHUB_WORKSPACE"/images/super.img  
   End_Time 打包super
   for partition in "${partitions[@]}"; do
     rm -rf "$GITHUB_WORKSPACE"/images/$partition.img
