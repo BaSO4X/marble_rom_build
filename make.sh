@@ -200,7 +200,7 @@ partitions=("mi_ext" "odm" "product" "system" "system_ext" "vendor" "vendor_dlkm
   --group qti_dynamic_partitions_a:9126805504 \
   --group qti_dynamic_partitions_b:9126805504 \
   --virtual-ab -F \
-  --output "$GITHUB_WORKSPACE"/images/super.img  
+  --output "$GITHUB_WORKSPACE"/images/super.img
   End_Time 打包super
   for partition in "${partitions[@]}"; do
     rm -rf "$GITHUB_WORKSPACE"/images/$partition.img
