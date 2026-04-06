@@ -9,26 +9,6 @@ on:
         description: "底包下载地址"
         required: true
         default: 'https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com/OS1.0.15.0.ULMCNXM/miui_MUNCH_OS1.0.15.0.ULMCNXM_945b975314_14.0.zip'
-      IMAGE_TYPE:
-        description: "IMAGE 格式"
-        required: true
-        default: 'erofs'
-        type: choice
-        options:
-        - erofs
-        - ext4
-      EXT_RW:
-        description: 'EXT4 可读写'
-        required: true
-        type: boolean
-      DECRYPTION:
-        description: '去除强制加密'
-        required: true
-        type: boolean
-      PERFECTICON:
-        description: '启用完美图标'
-        required: true
-        type: boolean
 jobs:
   build:
     permissions:
@@ -54,7 +34,7 @@ jobs:
           sudo pip install google protobuf
       - name: 构建 ROM
         run: |
-          sudo bash "$GITHUB_WORKSPACE"/make.sh ${{ github.event.inputs.URL }} ${{ github.event.inputs.VENDOR_URL }} ${{ github.event.inputs.IMAGE_TYPE }} ${{ github.event.inputs.EXT_RW }} ${{ github.event.inputs.DECRYPTION }} ${{ github.event.inputs.PERFECTICON }} $GITHUB_ENV $GITHUB_WORKSPACE
+          sudo bash "$GITHUB_WORKSPACE"/make.sh ${{ github.event.inputs.URL }} ${{ github.event.inputs.VENDOR_URL }} $GITHUB_ENV $GITHUB_WORKSPACE
       - name: 处理 ROM
         run: |
           mkdir -p "$GITHUB_WORKSPACE"/GithubRelease
