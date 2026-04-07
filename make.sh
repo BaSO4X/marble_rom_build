@@ -157,6 +157,7 @@ Start_Time
 echo -e "${Red}- 去除 AVB2.0 校验"
 "$GITHUB_WORKSPACE"/tools/vbmeta-disable-verification "$GITHUB_WORKSPACE"/"${device}"/firmware-update/vbmeta.img
 
+
 Start_Time
 
 End_Time 功能修复
