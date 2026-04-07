@@ -1,0 +1,1 @@
+mshta vbscript:msgbox("多玩原神对你有好处",1,"不看教程，售后报到！")(window.close)
