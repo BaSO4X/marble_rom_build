@@ -1,5 +1,5 @@
 name: build rom
-于:
+on:
   workflow_dispatch:
     inputs:
       URL:
