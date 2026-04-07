@@ -85,42 +85,40 @@ End_Time 下载系统包
 ### 解包
 echo -e "${Red}- 开始解压系统包"
 mkdir -p "$GITHUB_WORKSPACE"/vendor_zip
-mkdir -p "$GITHUB_WORKSPACE"/images
+mkdir -p "$GITHUB_WORKSPACE"/port_zip
 mkdir -p "$GITHUB_WORKSPACE"/images/config
 mkdir -p "$GITHUB_WORKSPACE"/super
-mkdir -p "$GITHUB_WORKSPACE"/zip
+mkdir -p "$GITHUB_WORKSPACE"/Extra_dir
 
 echo -e "${Yellow}- 开始解压底包"
 Start_Time
 $a7z x "$GITHUB_WORKSPACE"/${vendor_zip_name} -o"$GITHUB_WORKSPACE"/vendor_zip payload.bin >/dev/null
 rm -rf "$GITHUB_WORKSPACE"/${vendor_zip_name}
 End_Time 解压底包
-mkdir -p "$GITHUB_WORKSPACE"/Extra_dir
+
 echo -e "${Red}- 开始解底包 Payload"
 $payload_extract -s -o "$GITHUB_WORKSPACE"/firmware/images -i "$GITHUB_WORKSPACE"/vendor_zip/payload.bin -S abl,aop,aop_config,bluetooth,boot,cpucp,devcfg,dsp,dtbo,featenabler,hyp,keymaster,modem,qupfw,shrm,tz,uefi,uefisecapp,vendor_boot,xbl,xbl_config,xbl_ramdump,vbmeta,vbmeta_system -e -T0
 $payload_extract -s -o "$GITHUB_WORKSPACE"/super -i "$GITHUB_WORKSPACE"/vendor_zip/payload.bin -S odm,vendor_dlkm -e -T0
-$payload_extract -s -o "$GITHUB_WORKSPACE"/images -i "$GITHUB_WORKSPACE"/vendor_zip/payload.bin -S vendor -e -T0
+$payload_extract -s -o "$GITHUB_WORKSPACE"/Extra_dir -i "$GITHUB_WORKSPACE"/vendor_zip/payload.bin -S vendor -e -T0
 sudo rm -rf "$GITHUB_WORKSPACE"/vendor_zip/payload.bin
 
+echo -e "${Yellow}- 开始解压移植包"
+Start_Time
+$a7z x "$GITHUB_WORKSPACE"/${port_zip_name} -o"$GITHUB_WORKSPACE"/port_zip payload.bin >/dev/null
+rm -rf "$GITHUB_WORKSPACE"/${port_zip_name}
+End_Time 解压移植包
+
+echo -e "${Red}- 开始解移植包 Payload"
+$payload_extract -s -o "$GITHUB_WORKSPACE"/Extra_dir -i "$GITHUB_WORKSPACE"/port_zip/payload.bin -S mi_ext,product,system,system_ext -e -T0
+sudo rm -rf "$GITHUB_WORKSPACE"/port_zip/payload.bin
+
 echo -e "${Red}- 开始分解Images"
-for i in system_ext odm vendor; do
+for i in system_ext vendor mi_ext system product; do
   echo -e "${Yellow}- 正在分解底包: $i.img"
-  cd "$GITHUB_WORKSPACE"/vendor_zip
+  cd "$GITHUB_WORKSPACE"/images
   sudo $erofs_extract -i "$GITHUB_WORKSPACE"/Extra_dir/$i.img -x -s
   rm -rf "$GITHUB_WORKSPACE"/Extra_dir/$i.img
 done
-sudo mkdir -p "$GITHUB_WORKSPACE"/vendor_zip/firmware-update/
-sudo cp -rf "$GITHUB_WORKSPACE"/Extra_dir/* "$GITHUB_WORKSPACE"/vendor_zip/firmware-update/
-cd "$GITHUB_WORKSPACE"/images
-echo -e "${Red}- 开始解移植包 Payload"
-$payload_extract -s -o "$GITHUB_WORKSPACE"/images/ -i "${URL}" -X mi_ext,product,system,system_ext,odm -T0
-echo -e "${Red}- 开始分解移植包 Images"
-for i in mi_ext product system system_ext odm; do
-  echo -e "${Yellow}- 正在分解移植包: $i"
-  sudo $erofs_extract -i "$GITHUB_WORKSPACE"/images/$i.img -x -s
-  rm -rf "$GITHUB_WORKSPACE"/images/$i.img
-done
-
 # 去除 AVB2.0 校验
 echo -e "${Red}- 去除 AVB2.0 校验"
 "$GITHUB_WORKSPACE"/tools/vbmeta-disable-verification "$GITHUB_WORKSPACE"/firmware/images/vbmeta.img
