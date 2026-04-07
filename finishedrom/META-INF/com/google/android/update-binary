@@ -1,0 +1,57 @@
+#!/sbin/bash
+OUTFD=/proc/self/fd/$2
+ZIPFILE="$3"
+ZIPNAME=${ZIPFILE##*/}
+
+[ -d /tmp ] && rm -rf /tmp
+mkdir -p /tmp
+unzip "$ZIPFILE" bin/zstd -d /tmp
+chmod -R 0755 /tmp
+
+ui_print(){
+    echo -e "ui_print $1\nui_print" > $OUTFD
+}
+
+package_extract_file() {
+    unzip -p "$ZIPFILE" $1 >$2
+}
+
+package_extract_zstd() {
+    unzip -p "$ZIPFILE" $1 | /tmp/bin/zstd -k -d >$2
+}
+
+PartitionFilePath=/dev/block/bootdevice/by-name/
+
+flash_partition() {
+    local partition=$1
+    ui_print "刷入$partition分区"
+    package_extract_file "images/$partition.img" "${PartitionFilePath}/${partition}_a"
+    package_extract_file "images/$partition.img" "${PartitionFilePath}/${partition}_b"
+}
+
+ui_print " "
+ui_print "$ZIPNAME"
+ui_print "脚本作者：酷安@閃電Flashh"
+ui_print "ROM作者: 酷安@硫酸钡沉淀"
+ui_print "开始刷写"
+ui_print " "
+
+for partition in abl aop aop_config bluetooth boot cpucp devcfg dsp dtbo featenabler hyp imagefv keymaster modem qupfw recovery shrm tz uefi uefisecapp vbmeta vbmeta_system vendor_boot xbl xbl_config xbl_ramdump; do
+    flash_partition $partition                  
+done
+
+ui_print "刷入super分区"
+package_extract_zstd "super.img.zst" "${PartitionFilePath}/super"
+
+ui_print "刷入cust分区"
+package_extract_file "images/cust.img" "${PartitionFilePath}/cust"
+
+ui_print " "
+ui_print "清除缓存"
+rm -rf /data/cache/
+rm -rf /data/dalvik-cache/
+rm -rf /data/system/package_cache/
+
+ui_print " "
+ui_print "刷写完成"
+exit 0

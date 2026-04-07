@@ -1,0 +1,1 @@
+mshta vbscript:msgbox("玩原神导致神志不清了都！",1,"去看教程！")(window.close)
