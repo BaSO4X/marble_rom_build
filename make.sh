@@ -35,6 +35,7 @@ erofs_mkfs="$GITHUB_WORKSPACE"/tools/mkfs.erofs
 lpmake="$GITHUB_WORKSPACE"/tools/lpmake
 
 sudo chmod -R 777 "$GITHUB_WORKSPACE"/tools
+sudo chmod -R 777 "$GITHUB_WORKSPACE"/firmware
 
 Start_Time() {
   Start_s=$(date +%s)
@@ -75,36 +76,41 @@ End_Time() {
 ### 系统包下载
 echo -e "${Red}- 开始下载系统包"
 Start_Time
-echo -e "${Yellow}- 开始下载底包"
-aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" ${VENDOR_URL}
-aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" ${VENDOR_URL}
-End_Time 下载底包
+aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" ${VENDOR_URL} &
+aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" ${URL} &
+wait
+End_Time 下载系统包
 ### 系统包下载结束
 
 ### 解包
 echo -e "${Red}- 开始解压系统包"
-mkdir -p "$GITHUB_WORKSPACE"/"${device}"
+mkdir -p "$GITHUB_WORKSPACE"/vendor_zip
+mkdir -p "$GITHUB_WORKSPACE"/images
 mkdir -p "$GITHUB_WORKSPACE"/images/config
+mkdir -p "$GITHUB_WORKSPACE"/super
 mkdir -p "$GITHUB_WORKSPACE"/zip
 
 echo -e "${Yellow}- 开始解压底包"
 Start_Time
-$a7z x "$GITHUB_WORKSPACE"/${vendor_zip_name} -o"$GITHUB_WORKSPACE"/"${device}" payload.bin >/dev/null
+$a7z x "$GITHUB_WORKSPACE"/${vendor_zip_name} -o"$GITHUB_WORKSPACE"/vendor_zip payload.bin >/dev/null
 rm -rf "$GITHUB_WORKSPACE"/${vendor_zip_name}
 End_Time 解压底包
 mkdir -p "$GITHUB_WORKSPACE"/Extra_dir
 echo -e "${Red}- 开始解底包 Payload"
-$payload_extract -s -o "$GITHUB_WORKSPACE"/Extra_dir/ -i "$GITHUB_WORKSPACE"/"${device}"/payload.bin -X mi_ext,system,product -e -T0
-sudo rm -rf "$GITHUB_WORKSPACE"/"${device}"/payload.bin
-echo -e "${Red}- 开始分解底包 Images"
+$payload_extract -s -o "$GITHUB_WORKSPACE"/firmware/images -i "$GITHUB_WORKSPACE"/vendor_zip/payload.bin -S abl,aop,aop_config,bluetooth,boot,cpucp,devcfg,dsp,dtbo,featenabler,hyp,keymaster,modem,qupfw,shrm,tz,uefi,uefisecapp,vendor_boot,xbl,xbl_config,xbl_ramdump,vbmeta,vbmeta_system -e -T0
+$payload_extract -s -o "$GITHUB_WORKSPACE"/super -i "$GITHUB_WORKSPACE"/vendor_zip/payload.bin -S odm,vendor_dlkm -e -T0
+$payload_extract -s -o "$GITHUB_WORKSPACE"/images -i "$GITHUB_WORKSPACE"/vendor_zip/payload.bin -S vendor -e -T0
+sudo rm -rf "$GITHUB_WORKSPACE"/vendor_zip/payload.bin
+
+echo -e "${Red}- 开始分解Images"
 for i in system_ext odm vendor; do
   echo -e "${Yellow}- 正在分解底包: $i.img"
-  cd "$GITHUB_WORKSPACE"/"${device}"
+  cd "$GITHUB_WORKSPACE"/vendor_zip
   sudo $erofs_extract -i "$GITHUB_WORKSPACE"/Extra_dir/$i.img -x -s
   rm -rf "$GITHUB_WORKSPACE"/Extra_dir/$i.img
 done
-sudo mkdir -p "$GITHUB_WORKSPACE"/"${device}"/firmware-update/
-sudo cp -rf "$GITHUB_WORKSPACE"/Extra_dir/* "$GITHUB_WORKSPACE"/"${device}"/firmware-update/
+sudo mkdir -p "$GITHUB_WORKSPACE"/vendor_zip/firmware-update/
+sudo cp -rf "$GITHUB_WORKSPACE"/Extra_dir/* "$GITHUB_WORKSPACE"/vendor_zip/firmware-update/
 cd "$GITHUB_WORKSPACE"/images
 echo -e "${Red}- 开始解移植包 Payload"
 $payload_extract -s -o "$GITHUB_WORKSPACE"/images/ -i "${URL}" -X mi_ext,product,system,system_ext,odm -T0
@@ -114,6 +120,11 @@ for i in mi_ext product system system_ext odm; do
   sudo $erofs_extract -i "$GITHUB_WORKSPACE"/images/$i.img -x -s
   rm -rf "$GITHUB_WORKSPACE"/images/$i.img
 done
+
+# 去除 AVB2.0 校验
+echo -e "${Red}- 去除 AVB2.0 校验"
+"$GITHUB_WORKSPACE"/tools/vbmeta-disable-verification "$GITHUB_WORKSPACE"/firmware/images/vbmeta.img
+"$GITHUB_WORKSPACE"/tools/vbmeta-disable-verification "$GITHUB_WORKSPACE"/firmware/images/vbmeta_system.img
 ### 解包结束
 
 ### 写入变量
@@ -137,7 +148,7 @@ port_security_patch=$(grep "ro.build.version.security_patch=" "$system_build_pro
 echo -e "${Blue}- 移植包安全补丁版本: $port_security_patch"
 echo "port_security_patch=$port_security_patch" >>$GITHUB_ENV
 # 底包安全补丁
-vendor_build_prop=$GITHUB_WORKSPACE/${device}/vendor/build.prop
+vendor_build_prop=$GITHUB_WORKSPACE/vendor_zip/vendor/build.prop
 vendor_security_patch=$(grep "ro.vendor.build.security_patch=" "$vendor_build_prop" | awk -F "=" '{print $2}')
 echo -e "${Blue}- 底包安全补丁版本: $vendor_security_patch"
 echo "vendor_security_patch=$vendor_security_patch" >>$GITHUB_ENV
@@ -146,7 +157,7 @@ port_base_line=$(grep "ro.system.build.id=" "$system_build_prop" | awk -F "=" '{
 echo -e "${Blue}- 移植包基线版本: $port_base_line"
 echo "port_base_line=$port_base_line" >>$GITHUB_ENV
 # 底包基线版本
-system_ext_build_prop=$GITHUB_WORKSPACE/${device}/system_ext/etc/build.prop
+system_ext_build_prop=$GITHUB_WORKSPACE/vendor_zip/system_ext/etc/build.prop
 origin_base_line=$(grep "ro.system_ext.build.id=" "$system_ext_build_prop" | awk -F "=" '{print $2}')
 echo -e "${Blue}- 底包基线版本: $origin_base_line"
 echo "origin_base_line=$origin_base_line" >>$GITHUB_ENV
@@ -159,10 +170,6 @@ echo "vendor_base_line=$vendor_base_line" >>$GITHUB_ENV
 ### 功能修复
 echo -e "${Red}- 开始功能修复"
 Start_Time
-# 去除 AVB2.0 校验
-echo -e "${Red}- 去除 AVB2.0 校验"
-"$GITHUB_WORKSPACE"/tools/vbmeta-disable-verification "$GITHUB_WORKSPACE"/"${device}"/firmware-update/vbmeta.img
-
 
 Start_Time
 
@@ -229,15 +236,15 @@ End_Time 压缩super.zst
 # 生成刷机包
 echo -e "${Red}- 生成刷机包"
 Start_Time
-sudo $a7z a "$GITHUB_WORKSPACE"/zip/${device}-2in1_full-${port_os_version}.zip "$GITHUB_WORKSPACE"/images/* >/dev/null
+sudo $a7z a "$GITHUB_WORKSPACE"/zip/vendor_zip-2in1_full-${port_os_version}.zip "$GITHUB_WORKSPACE"/images/* >/dev/null
 sudo rm -rf "$GITHUB_WORKSPACE"/images
 End_Time 压缩卡刷包
 # 定制 ROM 包名
 echo -e "${Red}- 定制 ROM 包名"
-md5=$(md5sum "$GITHUB_WORKSPACE"/zip/${device}-2in1_full-${port_os_version}.zip)
+md5=$(md5sum "$GITHUB_WORKSPACE"/zip/vendor_zip-2in1_full-${port_os_version}.zip)
 echo "MD5=${md5:0:32}" >>$GITHUB_ENV
 zip_md5=${md5:0:10}
-rom_name="${device}-2in1_full-${port_os_version}-user-${android_version}.0-${zip_md5}.zip"
-sudo mv "$GITHUB_WORKSPACE"/zip/${device}-2in1_full-${port_os_version}.zip "$GITHUB_WORKSPACE"/zip/"${rom_name}"
+rom_name="vendor_zip-2in1_full-${port_os_version}-user-${android_version}.0-${zip_md5}.zip"
+sudo mv "$GITHUB_WORKSPACE"/zip/vendor_zip-2in1_full-${port_os_version}.zip "$GITHUB_WORKSPACE"/zip/"${rom_name}"
 echo "rom_name=$rom_name" >>$GITHUB_ENV
 ### 输出刷机包结束
