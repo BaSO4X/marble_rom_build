@@ -12,11 +12,16 @@ Green='\033[1;32m'  # 粗体绿色
 
 device=marble # 设备代号
 
-port_os_version=$(echo ${URL} | cut -d"/" -f4)                   # 移植包的 OS 版本号
-port_zip_name=$(echo ${URL} | cut -d"/" -f5)                     # 移植包的 zip 名称
-vendor_os_version=$(echo ${VENDOR_URL} | cut -d"/" -f4)          # 底包的 OS 版本号
-vendor_zip_name=$(echo ${VENDOR_URL} | cut -d"/" -f5)            # 底包的 zip 名称
-android_version=$(echo ${URL} | cut -d"." -f12 | cut -d"-" -f3) # Android 版本号
+# 移植包 OS 版本号
+port_os_version=$(echo "$URL" | awk -F'/' '{print $(NF-1)}')
+# 移植包 zip 名称
+port_zip_name=$(echo "$URL" | awk -F'/' '{print $NF}' | awk -F'?' '{print $1}')
+# 底包 OS 版本号
+vendor_os_version=$(echo "$VENDOR_URL" | awk -F'/' '{print $(NF-1)}')
+# 底包 zip 名称
+vendor_zip_name=$(echo "$VENDOR_URL" | awk -F'/' '{print $NF}' | awk -F'?' '{print $1}')
+# Android 版本号
+android_version=$(echo "$URL" | grep -oE '-user-[0-9]+' | grep -oE '[0-9]+')
 build_time=$(date) && build_utc=$(date -d "$build_time" +%s)   # 构建时间
 
 magiskboot="$GITHUB_WORKSPACE"/tools/magiskboot
@@ -71,6 +76,7 @@ End_Time() {
 echo -e "${Red}- 开始下载系统包"
 Start_Time
 echo -e "${Yellow}- 开始下载底包"
+aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" ${VENDOR_URL}
 aria2c -x16 -j$(nproc) -U "Mozilla/5.0" -d "$GITHUB_WORKSPACE" ${VENDOR_URL}
 End_Time 下载底包
 ### 系统包下载结束
