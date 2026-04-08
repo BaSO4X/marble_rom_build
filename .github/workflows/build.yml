@@ -1,4 +1,4 @@
-name: build for munch
+name: build
 on:
   workflow_dispatch:
     inputs:
@@ -8,7 +8,7 @@ on:
       VENDOR_URL:
         description: "底包下载地址"
         required: true
-        default: 'https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com/OS1.0.15.0.ULMCNXM/miui_MUNCH_OS1.0.15.0.ULMCNXM_945b975314_14.0.zip'
+        default: 'https://ultimateota.d.miui.com/OS3.0.1.0.VMRCNXM/marble-ota_full-OS3.0.1.0.VMRCNXM-user-15.0-ac8e5cc1cc.zip?t=1775648433&s=7fa80e8b308a015186f64e63feff10a3'
 jobs:
   build:
     permissions:
@@ -42,7 +42,7 @@ jobs:
           sudo split -b 1536M -d "$GITHUB_WORKSPACE"/zip/${{ env.rom_name }} ${{ env.rom_name }}
           cd "$GITHUB_WORKSPACE"
           touch file.log
-          echo -e "移植机型: ${{ env.model }}\n\n底包版本: ${{ env.vendor_os_version }}\n底包安全补丁版本: ${{ env.vendor_security_patch }}\n底包基线版本: ${{ env.origin_base_line}}\n底包vendor基线版本: ${{ env.vendor_base_line}}\n\n移植包版本: ${{ env.port_os_version }}\n移植包安全补丁版本: ${{ env.port_security_patch }}\n移植包基线版本: ${{ env.port_base_line }}" > file.log
+          echo -e "移植机型: ${{ env.model }}\n\n底包版本: ${{ env.vendor_os_version }}\n底包安全补丁版本: ${{ env.vendor_security_patch }}\n底包vendor基线版本: ${{ env.vendor_base_line}}\n\n移植包版本: ${{ env.port_os_version }}\n移植包安全补丁版本: ${{ env.port_security_patch }}\n移植包基线版本: ${{ env.port_base_line }}" > file.log
       - name: 上传到 Github Release
         uses: ncipollo/release-action@main
         with:
