@@ -241,7 +241,7 @@ partitions=("mi_ext" "product" "system" "system_ext" "vendor")
     Start_Time
     sudo $erofs_mkfs --quiet -zlz4hc,9 -T 1230768000 --mount-point /$partition --fs-config-file "$GITHUB_WORKSPACE"/images/config/"$partition"_fs_config --file-contexts "$GITHUB_WORKSPACE"/images/config/"$partition"_file_contexts "$GITHUB_WORKSPACE"/super/$partition.img "$GITHUB_WORKSPACE"/images/$partition
     End_Time 打包erofs
-    eval "$partition"_size=$(du -sb "$GITHUB_WORKSPACE"/super/$partition.img | awk {'print $1'})
+    for img in "$GITHUB_WORKSPACE"/super/*.img; do p=$(basename "$img" .img); eval "$p"_size=$(du -sb "$img" | awk '{print $1}'); done
     sudo rm -rf "$GITHUB_WORKSPACE"/images/$partition
   done
   sudo rm -rf "$GITHUB_WORKSPACE"/images/config
