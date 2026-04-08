@@ -90,6 +90,7 @@ mkdir -p "$GITHUB_WORKSPACE"/port_zip
 mkdir -p "$GITHUB_WORKSPACE"/images/config
 mkdir -p "$GITHUB_WORKSPACE"/super
 mkdir -p "$GITHUB_WORKSPACE"/Extra_dir
+mkdir -p "$GITHUB_WORKSPACE"/zip
 
 echo -e "${Yellow}- 开始解压底包"
 Start_Time
@@ -163,59 +164,113 @@ echo "vendor_base_line=$vendor_base_line" >>$GITHUB_ENV
 ### 功能修复
 echo -e "${Red}- 开始功能修复"
 Start_Time
-
-Start_Time
-
+echo "正在复制通用文件..."
+mkdir -p "$GITHUB_WORKSPACE"/images
+\cp -rf "$GITHUB_WORKSPACE"/files/common/* "$GITHUB_WORKSPACE"/images/
+echo "复制完成"
+echo "处理build.prop"
+cat "$GITHUB_WORKSPACE"/files/build.prop >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
+echo "处理完成"
+echo "精简apk"
+rm -rf "$GITHUB_WORKSPACE"/images/product/app/AnalyticsCore
+rm -rf "$GITHUB_WORKSPACE"/images/product/app/BSGameCenter
+rm -rf "$GITHUB_WORKSPACE"/images/product/app/HybridPlatform
+rm -rf "$GITHUB_WORKSPACE"/images/product/app/MiTrustService
+rm -rf "$GITHUB_WORKSPACE"/images/product/app/subscreencenter
+rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/OS2VipAccount
+rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/SmartHome
+rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/BaidulME
+rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/Health
+rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/iFlytekIME
+rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MIGalleryLockscreen
+rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MIpay
+rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MIService
+rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MiShop
+rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MIUIDuokanReader
+rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MIUIEmail
+rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MIUIGameCenter
+rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MIUIHuanji
+rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MIUIMusicT
+rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MIUINewHome_Removable
+rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MIUIVideo
+rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MIUIVirtualSim
+rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MIUIYoupin
+rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MiRadio
+rm -rf "$GITHUB_WORKSPACE"/images/product/priv-app/MiniGameService
+rm -rf "$GITHUB_WORKSPACE"/images/product/priv-app/MIUIBrowser
+rm -rf "$GITHUB_WORKSPACE"/images/product/pangu/system/app/Nfc_st
+echo "精简apk完成"
+echo "正在执行特定机型操作..."
+if [ "$model" = "popsicle" ] || [ "$model" = "pandora" ] || [ "$model" = "pudding" ] || [ "$model" = "nezha" ]; then
+  echo "ro.display.enable_pwm_switch=false" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
+  echo "persist.sys.enhance_vkpipelinecache.enable=false" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
+elif [ "$model" = "vermeer" ]; then
+  echo "#k70" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
+  echo "#高级材质" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
+  echo "persist.sys.background_blur_mode=0" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
+  echo "persist.sys.background_blur_version=2" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
+  echo "persist.sys.advanced_visual_release=4" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
+  echo "persist.sys.background_blur_supported=true" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
+  echo "persist.sys.background_blur_status_default=true" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
+  echo "#堆叠桌面支持" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
+  echo "persist.sys.computility.cpulevel=6" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
+  echo "persist.sys.computility.gpulevel=6" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
+  echo "#锁屏模糊效果" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
+  echo "ro.launcher.blur.appLaunch=1" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
+  echo "ro.sf.blurs_are_expensive=0" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
+  echo "persist.sys.add_blurnoise_supported=true" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
+else
+  echo "persist.sys.enhance_vkpipelinecache.enable=false" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
+fi
 End_Time 功能修复
 ### 功能修复结束
 
 ### 生成 super.img
 echo -e "${Red}- 开始打包super.img"
 Start_Time
-partitions=("mi_ext" "odm" "product" "system" "system_ext" "vendor" "vendor_dlkm")
+partitions=("mi_ext" "product" "system" "system_ext" "vendor")
   for partition in "${partitions[@]}"; do
     echo -e "${Red}- 正在生成: $partition"
     sudo python3 "$GITHUB_WORKSPACE"/tools/fspatch.py "$GITHUB_WORKSPACE"/images/$partition "$GITHUB_WORKSPACE"/images/config/"$partition"_fs_config
     sudo python3 "$GITHUB_WORKSPACE"/tools/contextpatch.py "$GITHUB_WORKSPACE"/images/$partition "$GITHUB_WORKSPACE"/images/config/"$partition"_file_contexts None
     Start_Time
-    sudo $erofs_mkfs --quiet -zlz4hc,9 -T 1230768000 --mount-point /$partition --fs-config-file "$GITHUB_WORKSPACE"/images/config/"$partition"_fs_config --file-contexts "$GITHUB_WORKSPACE"/images/config/"$partition"_file_contexts "$GITHUB_WORKSPACE"/images/$partition.img "$GITHUB_WORKSPACE"/images/$partition
+    sudo $erofs_mkfs --quiet -zlz4hc,9 -T 1230768000 --mount-point /$partition --fs-config-file "$GITHUB_WORKSPACE"/images/config/"$partition"_fs_config --file-contexts "$GITHUB_WORKSPACE"/images/config/"$partition"_file_contexts "$GITHUB_WORKSPACE"/super/$partition.img "$GITHUB_WORKSPACE"/images/$partition
     End_Time 打包erofs
-    eval "$partition"_size=$(du -sb "$GITHUB_WORKSPACE"/images/$partition.img | awk {'print $1'})
+    eval "$partition"_size=$(du -sb "$GITHUB_WORKSPACE"/super/$partition.img | awk {'print $1'})
     sudo rm -rf "$GITHUB_WORKSPACE"/images/$partition
   done
   sudo rm -rf "$GITHUB_WORKSPACE"/images/config
-  Start_Time
   $lpmake --metadata-size 65536 --super-name super --block-size 4096 \
   --partition mi_ext_a:readonly:"$mi_ext_size":qti_dynamic_partitions_a \
-  --image mi_ext_a="$GITHUB_WORKSPACE"/images/mi_ext.img \
+  --image mi_ext_a="$GITHUB_WORKSPACE"/super/mi_ext.img \
   --partition mi_ext_b:readonly:0:qti_dynamic_partitions_b \
   --partition odm_a:readonly:"$odm_size":qti_dynamic_partitions_a \
-  --image odm_a="$GITHUB_WORKSPACE"/images/odm.img \
+  --image odm_a="$GITHUB_WORKSPACE"/super/odm.img \
   --partition odm_b:readonly:0:qti_dynamic_partitions_b \
   --partition product_a:readonly:"$product_size":qti_dynamic_partitions_a \
-  --image product_a="$GITHUB_WORKSPACE"/images/product.img \
+  --image product_a="$GITHUB_WORKSPACE"/super/product.img \
   --partition product_b:readonly:0:qti_dynamic_partitions_b \
   --partition system_a:readonly:"$system_size":qti_dynamic_partitions_a \
-  --image system_a="$GITHUB_WORKSPACE"/images/system.img \
+  --image system_a="$GITHUB_WORKSPACE"/super/system.img \
   --partition system_b:readonly:0:qti_dynamic_partitions_b \
   --partition system_ext_a:readonly:"$system_ext_size":qti_dynamic_partitions_a \
-  --image system_ext_a="$GITHUB_WORKSPACE"/images/system_ext.img \
+  --image system_ext_a="$GITHUB_WORKSPACE"/super/system_ext.img \
   --partition system_ext_b:readonly:0:qti_dynamic_partitions_b \
   --partition vendor_a:readonly:"$vendor_size":qti_dynamic_partitions_a \
-  --image vendor_a="$GITHUB_WORKSPACE"/images/vendor.img \
+  --image vendor_a="$GITHUB_WORKSPACE"/super/vendor.img \
   --partition vendor_b:readonly:0:qti_dynamic_partitions_b \
   --partition vendor_dlkm_a:readonly:"$vendor_dlkm_size":qti_dynamic_partitions_a \
-  --image vendor_dlkm_a="$GITHUB_WORKSPACE"/images/vendor_dlkm.img \  
+  --image vendor_dlkm_a="$GITHUB_WORKSPACE"/super/vendor_dlkm.img \  
   --partition vendor_dlkm_b:readonly:0:qti_dynamic_partitions_b \
   --device super:9126805504 \
   --metadata-slots 3 \
   --group qti_dynamic_partitions_a:9126805504 \
   --group qti_dynamic_partitions_b:9126805504 \
   --virtual-ab -F \
-  --output "$GITHUB_WORKSPACE"/images/super.img
+  --output "$GITHUB_WORKSPACE"/super/super.img
   End_Time 打包super
   for partition in "${partitions[@]}"; do
-    rm -rf "$GITHUB_WORKSPACE"/images/$partition.img
+    rm -rf "$GITHUB_WORKSPACE"/super/$partition.img
   done
 ### 生成 super.img 结束
 
@@ -223,21 +278,21 @@ partitions=("mi_ext" "odm" "product" "system" "system_ext" "vendor" "vendor_dlkm
 echo -e "${Red}- 开始生成刷机包"
 echo -e "${Red}- 开始压缩super.zst"
 Start_Time
-sudo find "$GITHUB_WORKSPACE"/images/ -exec touch -t 200901010000.00 {} \;
-zstd -12 -f "$GITHUB_WORKSPACE"/images/super.img -o "$GITHUB_WORKSPACE"/images/super.zst --rm
+sudo find "$GITHUB_WORKSPACE"/super/ -exec touch -t 200901010000.00 {} \;
+zstd -12 -f "$GITHUB_WORKSPACE"/super/super.img -o "$GITHUB_WORKSPACE"/firmware/super.zst --rm
 End_Time 压缩super.zst
 # 生成刷机包
 echo -e "${Red}- 生成刷机包"
 Start_Time
-sudo $a7z a "$GITHUB_WORKSPACE"/zip/vendor_zip-2in1_full-${port_os_version}.zip "$GITHUB_WORKSPACE"/images/* >/dev/null
+sudo $a7z a "$GITHUB_WORKSPACE"/zip/marble_HyperT-${port_os_version}-BaSO4.zip "$GITHUB_WORKSPACE"/firmware/* >/dev/null
 sudo rm -rf "$GITHUB_WORKSPACE"/images
 End_Time 压缩卡刷包
 # 定制 ROM 包名
 echo -e "${Red}- 定制 ROM 包名"
-md5=$(md5sum "$GITHUB_WORKSPACE"/zip/vendor_zip-2in1_full-${port_os_version}.zip)
+md5=$(md5sum "$GITHUB_WORKSPACE"/zip/marble_HyperT-${port_os_version}-BaSO4.zip)
 echo "MD5=${md5:0:32}" >>$GITHUB_ENV
 zip_md5=${md5:0:10}
-rom_name="vendor_zip-2in1_full-${port_os_version}-user-${android_version}.0-${zip_md5}.zip"
-sudo mv "$GITHUB_WORKSPACE"/zip/vendor_zip-2in1_full-${port_os_version}.zip "$GITHUB_WORKSPACE"/zip/"${rom_name}"
+rom_name="marble_HyperT-${port_os_version}-BaSO4-${zip_md5}.zip"
+sudo mv "$GITHUB_WORKSPACE"/zip/marble_HyperT-${port_os_version}-BaSO4.zip "$GITHUB_WORKSPACE"/zip/"${rom_name}"
 echo "rom_name=$rom_name" >>$GITHUB_ENV
 ### 输出刷机包结束
