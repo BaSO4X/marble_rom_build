@@ -2,8 +2,8 @@
 
 URL="$1"              # 移植包下载地址
 VENDOR_URL="$2"       # 底包下载地址
-GITHUB_ENV="$7"       # 输出环境变量
-GITHUB_WORKSPACE="$8" # 工作目录
+GITHUB_ENV="$3"       # 输出环境变量
+GITHUB_WORKSPACE="$4" # 工作目录
 
 Red='\033[1;31m'    # 粗体红色
 Yellow='\033[1;33m' # 粗体黄色
