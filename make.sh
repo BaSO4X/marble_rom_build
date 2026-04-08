@@ -36,6 +36,7 @@ lpmake="$GITHUB_WORKSPACE"/tools/lpmake
 
 sudo chmod -R 777 "$GITHUB_WORKSPACE"/tools
 sudo chmod -R 777 "$GITHUB_WORKSPACE"/firmware
+sudo chmod -R 777 "$GITHUB_WORKSPACE"/files
 
 Start_Time() {
   Start_s=$(date +%s)
@@ -131,8 +132,7 @@ echo -e "${Red}- 开始写入变量"
 echo "build_time=$build_time" >>$GITHUB_ENV
 echo -e "${Blue}- 构建日期: $build_time"
 # 移植包机型信息
-odm_build_prop="$GITHUB_WORKSPACE"/images/odm/etc/build.prop
-model=$(grep "ro.product.odm.marketname=" "$odm_build_prop" | cut -d'=' -f2)
+model=$(echo "$port_zip_name" | cut -d'-' -f1)
 echo "model=$model" >> $GITHUB_ENV
 echo -e "${Blue}- 移植包机型: $model"
 # 移植包版本
@@ -146,7 +146,7 @@ port_security_patch=$(grep "ro.build.version.security_patch=" "$system_build_pro
 echo -e "${Blue}- 移植包安全补丁版本: $port_security_patch"
 echo "port_security_patch=$port_security_patch" >>$GITHUB_ENV
 # 底包安全补丁
-vendor_build_prop=$GITHUB_WORKSPACE/vendor_zip/vendor/build.prop
+vendor_build_prop=$GITHUB_WORKSPACE/images/vendor/build.prop
 vendor_security_patch=$(grep "ro.vendor.build.security_patch=" "$vendor_build_prop" | awk -F "=" '{print $2}')
 echo -e "${Blue}- 底包安全补丁版本: $vendor_security_patch"
 echo "vendor_security_patch=$vendor_security_patch" >>$GITHUB_ENV
@@ -154,11 +154,6 @@ echo "vendor_security_patch=$vendor_security_patch" >>$GITHUB_ENV
 port_base_line=$(grep "ro.system.build.id=" "$system_build_prop" | awk -F "=" '{print $2}')
 echo -e "${Blue}- 移植包基线版本: $port_base_line"
 echo "port_base_line=$port_base_line" >>$GITHUB_ENV
-# 底包基线版本
-system_ext_build_prop=$GITHUB_WORKSPACE/vendor_zip/system_ext/etc/build.prop
-origin_base_line=$(grep "ro.system_ext.build.id=" "$system_ext_build_prop" | awk -F "=" '{print $2}')
-echo -e "${Blue}- 底包基线版本: $origin_base_line"
-echo "origin_base_line=$origin_base_line" >>$GITHUB_ENV
 # 底包vendor基线版本
 vendor_base_line=$(grep "ro.vendor.build.id=" "$vendor_build_prop" | awk -F "=" '{print $2}')
 echo -e "${Blue}- 底包vendor基线版本: $vendor_base_line"
