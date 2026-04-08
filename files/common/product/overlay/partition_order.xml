@@ -1,0 +1,24 @@
+<!-- Copyright (c) 2024 Qualcomm Technologies, Inc.
+      All Rights Reserved.
+      Confidential and Proprietary - Qualcomm Technologies, Inc.
+-->
+<!--MIUI MOD: Resource_BugFixUpstream-->
+<!--From least to greatest precedence is: system < system_ext < product < vendor < oem < odm-->
+<!--<partition-order>
+  <partition name="system"/>
+  <partition name="system_ext"/>
+  <partition name="product"/>
+  <partition name="vendor"/>
+  <partition name="oem"/>
+  <partition name="odm"/>
+</partition-order>-->
+<!--From least to greatest precedence is: system < system_ext < vendor < oem < odm < product-->
+<partition-order>
+  <partition name="system"/>
+  <partition name="system_ext"/>
+  <partition name="vendor"/>
+  <partition name="oem"/>
+  <partition name="odm"/>
+  <partition name="product"/>
+</partition-order>
+<!--END Resource_BugFixUpstream-->
