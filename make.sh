@@ -97,9 +97,9 @@ rm -rf "$GITHUB_WORKSPACE"/${vendor_zip_name}
 End_Time 解压底包
 
 echo -e "${Red}- 开始解底包 Payload"
-$payload_extract -s -o "$GITHUB_WORKSPACE"/firmware/images -i "$GITHUB_WORKSPACE"/vendor_zip/payload.bin -S abl,aop,aop_config,bluetooth,boot,cpucp,devcfg,dsp,dtbo,featenabler,hyp,keymaster,modem,qupfw,shrm,tz,uefi,uefisecapp,vendor_boot,xbl,xbl_config,xbl_ramdump,vbmeta,vbmeta_system -e -T0
-$payload_extract -s -o "$GITHUB_WORKSPACE"/super -i "$GITHUB_WORKSPACE"/vendor_zip/payload.bin -S odm,vendor_dlkm -e -T0
-$payload_extract -s -o "$GITHUB_WORKSPACE"/Extra_dir -i "$GITHUB_WORKSPACE"/vendor_zip/payload.bin -S vendor -e -T0
+$payload_extract -s -o "$GITHUB_WORKSPACE"/firmware/images -i "$GITHUB_WORKSPACE"/vendor_zip/payload.bin -X abl,aop,aop_config,bluetooth,boot,cpucp,devcfg,dsp,dtbo,featenabler,hyp,keymaster,modem,qupfw,shrm,tz,uefi,uefisecapp,vendor_boot,xbl,xbl_config,xbl_ramdump,vbmeta,vbmeta_system -T0
+$payload_extract -s -o "$GITHUB_WORKSPACE"/super -i "$GITHUB_WORKSPACE"/vendor_zip/payload.bin -X odm,vendor_dlkm -T0
+$payload_extract -s -o "$GITHUB_WORKSPACE"/Extra_dir -i "$GITHUB_WORKSPACE"/vendor_zip/payload.bin -X vendor -T0
 sudo rm -rf "$GITHUB_WORKSPACE"/vendor_zip/payload.bin
 
 echo -e "${Yellow}- 开始解压移植包"
@@ -109,7 +109,7 @@ rm -rf "$GITHUB_WORKSPACE"/${port_zip_name}
 End_Time 解压移植包
 
 echo -e "${Red}- 开始解移植包 Payload"
-$payload_extract -s -o "$GITHUB_WORKSPACE"/Extra_dir -i "$GITHUB_WORKSPACE"/port_zip/payload.bin -S mi_ext,product,system,system_ext -e -T0
+$payload_extract -s -o "$GITHUB_WORKSPACE"/Extra_dir -i "$GITHUB_WORKSPACE"/port_zip/payload.bin -X mi_ext,product,system,system_ext -T0
 sudo rm -rf "$GITHUB_WORKSPACE"/port_zip/payload.bin
 
 echo -e "${Red}- 开始分解Images"
