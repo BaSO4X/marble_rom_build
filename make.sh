@@ -105,8 +105,7 @@ End_Time 解压底包
 
 echo -e "${Red}- 开始解底包 Payload"
 $payload_extract -s -o "$GITHUB_WORKSPACE"/firmware/images -i "$GITHUB_WORKSPACE"/vendor_zip/payload.bin -X abl,aop,aop_config,bluetooth,boot,cpucp,devcfg,dsp,dtbo,featenabler,hyp,keymaster,modem,qupfw,shrm,tz,uefi,uefisecapp,vendor_boot,xbl,xbl_config,xbl_ramdump,vbmeta,vbmeta_system -T0
-$payload_extract -s -o "$GITHUB_WORKSPACE"/super -i "$GITHUB_WORKSPACE"/vendor_zip/payload.bin -X odm,vendor_dlkm -T0
-$payload_extract -s -o "$GITHUB_WORKSPACE"/Extra_dir -i "$GITHUB_WORKSPACE"/vendor_zip/payload.bin -X vendor -T0
+$payload_extract -s -o "$GITHUB_WORKSPACE"/Extra_dir -i "$GITHUB_WORKSPACE"/vendor_zip/payload.bin -X vendor,odm,vendor_dlkm -T0
 sudo rm -rf "$GITHUB_WORKSPACE"/vendor_zip/payload.bin
 
 echo -e "${Yellow}- 开始解压移植包"
@@ -120,7 +119,7 @@ $payload_extract -s -o "$GITHUB_WORKSPACE"/Extra_dir -i "$GITHUB_WORKSPACE"/port
 sudo rm -rf "$GITHUB_WORKSPACE"/port_zip/payload.bin
 
 echo -e "${Red}- 开始分解Images"
-for i in system_ext vendor mi_ext system product; do
+for i in system_ext vendor mi_ext system product odm vendor_dlkm; do
   echo -e "${Yellow}- 正在分解底包: $i.img"
   cd "$GITHUB_WORKSPACE"/images
   sudo $erofs_extract -i "$GITHUB_WORKSPACE"/Extra_dir/$i.img -x -s
@@ -233,7 +232,7 @@ End_Time 功能修复
 ### 生成 super.img
 echo -e "${Red}- 开始打包super.img"
 Start_Time
-partitions=("mi_ext" "product" "system" "system_ext" "vendor")
+partitions=("mi_ext" "product" "system" "system_ext" "vendor" "odm" "vendor_dlkm")
   for partition in "${partitions[@]}"; do
     echo -e "${Red}- 正在生成: $partition"
     sudo python3 "$GITHUB_WORKSPACE"/tools/fspatch.py "$GITHUB_WORKSPACE"/images/$partition "$GITHUB_WORKSPACE"/images/config/"$partition"_fs_config
@@ -241,7 +240,7 @@ partitions=("mi_ext" "product" "system" "system_ext" "vendor")
     Start_Time
     sudo $erofs_mkfs --quiet -zlz4hc,9 -T 1230768000 --mount-point /$partition --fs-config-file "$GITHUB_WORKSPACE"/images/config/"$partition"_fs_config --file-contexts "$GITHUB_WORKSPACE"/images/config/"$partition"_file_contexts "$GITHUB_WORKSPACE"/super/$partition.img "$GITHUB_WORKSPACE"/images/$partition
     End_Time 打包erofs
-    for img in "$GITHUB_WORKSPACE"/super/*.img; do p=$(basename "$img" .img); eval "$p"_size=$(du -sb "$img" | awk '{print $1}'); done
+    eval "$partition"_size=$(du -sb "$GITHUB_WORKSPACE"/super/$partition.img | awk {'print $1'})
     sudo rm -rf "$GITHUB_WORKSPACE"/images/$partition
   done
   sudo rm -rf "$GITHUB_WORKSPACE"/images/config
