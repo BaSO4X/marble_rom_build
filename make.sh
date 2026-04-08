@@ -34,9 +34,14 @@ erofs_extract="$GITHUB_WORKSPACE"/tools/extract.erofs
 erofs_mkfs="$GITHUB_WORKSPACE"/tools/mkfs.erofs
 lpmake="$GITHUB_WORKSPACE"/tools/lpmake
 
-sudo chmod -R 777 "$GITHUB_WORKSPACE"/tools
-sudo chmod -R 777 "$GITHUB_WORKSPACE"/firmware
-sudo chmod -R 777 "$GITHUB_WORKSPACE"/files
+mkdir -p "$GITHUB_WORKSPACE"/tools
+mkdir -p "$GITHUB_WORKSPACE"/firmware
+mkdir -p "$GITHUB_WORKSPACE"/files
+
+chmod -R 755 "$GITHUB_WORKSPACE"/tools
+chmod -R 755 "$GITHUB_WORKSPACE"/firmware
+chmod -R 755 "$GITHUB_WORKSPACE"/files
+
 
 Start_Time() {
   Start_s=$(date +%s)

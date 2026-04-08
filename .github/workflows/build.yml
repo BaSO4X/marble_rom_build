@@ -8,7 +8,7 @@ on:
       VENDOR_URL:
         description: "底包下载地址"
         required: true
-        default: 'https://ultimateota.d.miui.com/OS3.0.1.0.VMRCNXM/marble-ota_full-OS3.0.1.0.VMRCNXM-user-15.0-ac8e5cc1cc.zip?t=1775648433&s=7fa80e8b308a015186f64e63feff10a3'
+        default: 'https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com/OS3.0.305.4.WPCCNXM/pudding-ota_full-OS3.0.305.4.WPCCNXM-user-16.0-e8518f4f7a.zip'
 jobs:
   build:
     permissions:
