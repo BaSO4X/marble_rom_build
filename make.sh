@@ -185,7 +185,7 @@ rm -rf "$GITHUB_WORKSPACE"/images/product/app/MiTrustService
 rm -rf "$GITHUB_WORKSPACE"/images/product/app/subscreencenter
 rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/OS2VipAccount
 rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/SmartHome
-rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/BaidulME
+rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/BaiduIME
 rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/Health
 rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/iFlytekIME
 rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MIGalleryLockscreen
