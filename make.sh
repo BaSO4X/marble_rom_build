@@ -229,6 +229,8 @@ else
   echo "persist.sys.enhance_vkpipelinecache.enable=false" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
 fi
 End_Time 功能修复
+curl -s https://api.github.com/repos/CuSO4with5H2O/Backup/releases/tags/backup | grep -o 'https://[^"]*MiuiCamera\.apk' | xargs -I {} aria2c -x16 -s16 -o MiuiCamera.apk {} -d "${GITHUB_WORKSPACE}/images/product/priv-app/MIUICamera"
+curl -s https://api.github.com/repos/CuSO4with5H2O/Backup/releases/tags/backup | grep -o 'https://[^"]*com\.android\.vndk\.v30\.apex' | xargs -I {} aria2c -x16 -s16 -o com.android.vndk.v30.apex {} -d "${GITHUB_WORKSPACE}/images/system_ext/apex"
 ### 功能修复结束
 
 ### 生成 super.img
