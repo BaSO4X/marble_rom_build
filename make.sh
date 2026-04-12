@@ -231,6 +231,10 @@ fi
 echo "下载超过100mb的文件"
 curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*MiuiCamera\.apk' | xargs -I {} aria2c -x16 -s16 -o MiuiCamera.apk {} -d "${GITHUB_WORKSPACE}/images/product/priv-app/MIUICamera"
 curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*com\.android\.vndk\.v30\.apex' | xargs -I {} aria2c -x16 -s16 -o com.android.vndk.v30.apex {} -d "${GITHUB_WORKSPACE}/images/system_ext/apex"
+echo "添加手电筒功能"
+7z e "$GITHUB_WORKSPACE"/images/product/app/MIUISystemUIPlugin/MIUISystemUIPlugin.apk classes3.dex -o"$GITHUB_WORKSPACE"/files/MIUISystemUIPlugin -y
+bash "$GITHUB_WORKSPACE"/files/MIUISystemUIPlugin/patch.sh
+zip -u "$GITHUB_WORKSPACE"/images/product/app/MIUISystemUIPlugin/MIUISystemUIPlugin.apk "$GITHUB_WORKSPACE"/files/MIUISystemUIPlugin/classes3.dex
 End_Time 功能修复
 ### 功能修复结束
 
