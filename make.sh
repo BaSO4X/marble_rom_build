@@ -236,7 +236,11 @@ echo "添加手电筒功能"
 bash "$GITHUB_WORKSPACE"/files/MIUISystemUIPlugin/patch.sh
 cd "$GITHUB_WORKSPACE"/files/MIUISystemUIPlugin
 zip -u "$GITHUB_WORKSPACE"/images/product/app/MIUISystemUIPlugin/MIUISystemUIPlugin.apk classes3.dex
-zipalign -f -p 4 "$GITHUB_WORKSPACE"/images/product/app/MIUISystemUIPlugin/MIUISystemUIPlugin.apk "$GITHUB_WORKSPACE"/images/product/app/MIUISystemUIPlugin/MIUISystemUIPlugin.apk
+mkdir -p "$GITHUB_WORKSPACE"/temp
+cp "$GITHUB_WORKSPACE"/images/product/app/MIUISystemUIPlugin/MIUISystemUIPlugin.apk "$GITHUB_WORKSPACE"/temp/MIUISystemUIPlugin.apk
+zipalign -f -p 4 "$GITHUB_WORKSPACE"/temp/MIUISystemUIPlugin.apk "$GITHUB_WORKSPACE"/temp/MIUISystemUIPlugin-tmp.apk
+cp "$GITHUB_WORKSPACE"/temp/MIUISystemUIPlugin-tmp.apk "$GITHUB_WORKSPACE"/images/product/app/MIUISystemUIPlugin/MIUISystemUIPlugin.apk
+rm -rf "$GITHUB_WORKSPACE"/temp
 End_Time 功能修复
 ### 功能修复结束
 
