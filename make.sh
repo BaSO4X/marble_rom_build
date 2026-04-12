@@ -210,21 +210,6 @@ echo "正在执行特定机型操作..."
 if [ "$model" = "popsicle" ] || [ "$model" = "pandora" ] || [ "$model" = "pudding" ] || [ "$model" = "nezha" ]; then
   echo "ro.display.enable_pwm_switch=false" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
   echo "persist.sys.enhance_vkpipelinecache.enable=false" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
-elif [ "$model" = "vermeer" ]; then
-  echo "#k70" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
-  echo "#高级材质" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
-  echo "persist.sys.background_blur_mode=0" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
-  echo "persist.sys.background_blur_version=2" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
-  echo "persist.sys.advanced_visual_release=4" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
-  echo "persist.sys.background_blur_supported=true" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
-  echo "persist.sys.background_blur_status_default=true" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
-  echo "#堆叠桌面支持" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
-  echo "persist.sys.computility.cpulevel=6" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
-  echo "persist.sys.computility.gpulevel=6" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
-  echo "#锁屏模糊效果" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
-  echo "ro.launcher.blur.appLaunch=1" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
-  echo "ro.sf.blurs_are_expensive=0" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
-  echo "persist.sys.add_blurnoise_supported=true" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
 else
   echo "persist.sys.enhance_vkpipelinecache.enable=false" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
 fi
