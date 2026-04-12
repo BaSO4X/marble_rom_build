@@ -295,16 +295,16 @@ partitions=("mi_ext" "product" "system" "system_ext" "vendor" "odm" "vendor_dlkm
 
 ### 输出刷机包
 echo -e "${Red}- 开始生成刷机包"
-echo -e "${Red}- 开始压缩super.zst"
+echo -e "${Red}- 开始压缩super"
 Start_Time
 sudo find "$GITHUB_WORKSPACE"/super/ -exec touch -t 200901010000.00 {} \;
 zstd -3 -f "$GITHUB_WORKSPACE"/super/super.img -o "$GITHUB_WORKSPACE"/firmware/super.img.zst
 rm -f "$GITHUB_WORKSPACE"/super/super.img
-End_Time 压缩super.zst
+End_Time 压缩super
 # 生成刷机包
 echo -e "${Red}- 生成刷机包"
 Start_Time
-sudo $a7z a -mx=1 -mx0:*.zst "$GITHUB_WORKSPACE"/zip/marble_HyperT-${port_os_version}-BaSO4.zip "$GITHUB_WORKSPACE"/firmware/* >/dev/null
+sudo $a7z a -mx=1 -m0=copy:*.zst "$GITHUB_WORKSPACE"/zip/marble_HyperT-${port_os_version}-BaSO4.zip "$GITHUB_WORKSPACE"/firmware/* >/dev/null
 sudo rm -rf "$GITHUB_WORKSPACE"/images
 End_Time 压缩卡刷包
 # 定制 ROM 包名
