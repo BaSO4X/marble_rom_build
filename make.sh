@@ -197,7 +197,9 @@ rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MIUIYoupin
 rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MiRadio
 rm -rf "$GITHUB_WORKSPACE"/images/product/priv-app/MiniGameService
 rm -rf "$GITHUB_WORKSPACE"/images/product/priv-app/MIUIBrowser
+rm -rf "$GITHUB_WORKSPACE"/images/product/priv-app/AIService
 rm -rf "$GITHUB_WORKSPACE"/images/product/pangu/system/app/Nfc_st
+rm -rf "$GITHUB_WORKSPACE"/images/mi_ext/product/ai/taiyi
 echo "精简apk完成"
 echo "正在执行特定机型操作..."
 if [ "$model" = "popsicle" ] || [ "$model" = "pandora" ] || [ "$model" = "pudding" ] || [ "$model" = "nezha" ]; then
