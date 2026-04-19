@@ -170,7 +170,6 @@ echo "vendor_base_line=$vendor_base_line" >>$GITHUB_ENV
 ### 功能修复
 echo -e "${Red}- 开始功能修复"
 Start_Time
-
 echo "精简apk"
 rm -rf "$GITHUB_WORKSPACE"/images/product/app/AnalyticsCore
 rm -rf "$GITHUB_WORKSPACE"/images/product/app/BSGameCenter
@@ -202,24 +201,32 @@ rm -rf "$GITHUB_WORKSPACE"/images/product/pangu/system/app/Nfc_st
 echo "精简apk完成"
 echo "正在执行特定机型操作..."
 if [ "$model" = "popsicle" ] || [ "$model" = "pandora" ] || [ "$model" = "pudding" ] || [ "$model" = "nezha" ]; then
-  echo "正在复制通用文件..."
+  echo "当前机型为17系列 $model"
+  echo "正在复制文件..."
   mkdir -p "$GITHUB_WORKSPACE"/images
   \cp -rf "$GITHUB_WORKSPACE"/files/common/* "$GITHUB_WORKSPACE"/images/
   echo "处理build.prop"
   cat "$GITHUB_WORKSPACE"/files/build.prop >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
   echo "ro.display.enable_pwm_switch=false" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
-elif [ "$model" = "vermeer" ]; then
-
+  curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*com\.android\.vndk\.v30\.apex' | xargs -I {} aria2c -x16 -s16 -o com.android.vndk.v30.apex {} -d "${GITHUB_WORKSPACE}/images/system_ext/apex"
+if [ "$model" = "vermeer" ] || [ "$model" = "fuxi" ] || [ "$model" = "nuwa" ] || [ "$model" = "ishtar" ]; then
+  echo "当前机型为8gen2系列 $model"
+  echo "正在复制文件..."
+  mkdir -p "$GITHUB_WORKSPACE"/images
+  \cp -rf "$GITHUB_WORKSPACE"/files/8gen2/* "$GITHUB_WORKSPACE"/images/
+  echo "处理build.prop"
+  cat "$GITHUB_WORKSPACE"/files/8gen2_build.prop >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
 else
-  echo "正在复制通用文件..."
+  echo "当前机型为其他机型 $model"
+  echo "正在复制文件..."
   mkdir -p "$GITHUB_WORKSPACE"/images
   \cp -rf "$GITHUB_WORKSPACE"/files/common/* "$GITHUB_WORKSPACE"/images/
   echo "处理build.prop"
   cat "$GITHUB_WORKSPACE"/files/build.prop >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
+  curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*com\.android\.vndk\.v30\.apex' | xargs -I {} aria2c -x16 -s16 -o com.android.vndk.v30.apex {} -d "${GITHUB_WORKSPACE}/images/system_ext/apex"
 fi
-echo "下载超过100mb的文件"
+echo "特定机型操作完成..."
 curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*MiuiCamera\.apk' | xargs -I {} aria2c -x16 -s16 -o MiuiCamera.apk {} -d "${GITHUB_WORKSPACE}/images/product/priv-app/MIUICamera"
-curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*com\.android\.vndk\.v30\.apex' | xargs -I {} aria2c -x16 -s16 -o com.android.vndk.v30.apex {} -d "${GITHUB_WORKSPACE}/images/system_ext/apex"
 echo "添加手电筒功能"
 7z e "$GITHUB_WORKSPACE"/images/product/app/MIUISystemUIPlugin/MIUISystemUIPlugin.apk classes3.dex -o"$GITHUB_WORKSPACE"/files/MIUISystemUIPlugin -y
 bash "$GITHUB_WORKSPACE"/files/MIUISystemUIPlugin/patch.sh
