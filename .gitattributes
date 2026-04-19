@@ -1,2 +1,0 @@
-MiuiCamera.apk filter=lfs diff=lfs merge=lfs -text
-com.android.vndk.v30.apex filter=lfs diff=lfs merge=lfs -text
