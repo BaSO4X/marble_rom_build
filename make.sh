@@ -203,6 +203,7 @@ rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MiRadio
 rm -rf "$GITHUB_WORKSPACE"/images/product/priv-app/MiniGameService
 rm -rf "$GITHUB_WORKSPACE"/images/product/priv-app/MIUIBrowser
 rm -rf "$GITHUB_WORKSPACE"/images/product/priv-app/AIService
+rm -rf "$GITHUB_WORKSPACE"/images/product/priv-app/MIService
 rm -rf "$GITHUB_WORKSPACE"/images/product/pangu/system/app/Nfc_st
 rm -rf "$GITHUB_WORKSPACE"/images/mi_ext/product/ai/taiyi
 echo "精简apk完成"
@@ -233,7 +234,7 @@ else
   curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*com\.android\.vndk\.v30\.apex' | xargs -I {} aria2c -x16 -s16 -o com.android.vndk.v30.apex {} -d "${GITHUB_WORKSPACE}/images/system_ext/apex"
 fi
 echo "特定机型操作完成..."
-curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*MiuiCamera\.apk' | xargs -I {} aria2c -x16 -s16 -o MiuiCamera.apk {} -d "${GITHUB_WORKSPACE}/images/product/priv-app/MIUICamera"
+curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*MiuiCamera\.apk' | xargs -I {} aria2c -x16 -s16 -o MiuiCamera.apk {} -d "${GITHUB_WORKSPACE}/images/product/priv-app/MiuiCamera"
 echo "添加手电筒功能"
 7z e "$GITHUB_WORKSPACE"/images/product/app/MIUISystemUIPlugin/MIUISystemUIPlugin.apk classes3.dex -o"$GITHUB_WORKSPACE"/files/MIUISystemUIPlugin -y
 bash "$GITHUB_WORKSPACE"/files/MIUISystemUIPlugin/patch.sh
