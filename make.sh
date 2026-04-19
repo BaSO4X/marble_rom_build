@@ -308,7 +308,7 @@ End_Time 压缩super
 echo -e "${Red}- 生成刷机包"
 Start_Time
 cd "$GITHUB_WORKSPACE"/firmware
-zip -1 "$GITHUB_WORKSPACE"/zip/marble_HyperT-${port_os_version}-BaSO4.zip $(ls | grep -v '^super.img.zst$')
+zip -r -1 "$GITHUB_WORKSPACE"/zip/marble_HyperT-${port_os_version}-BaSO4.zip $(ls | grep -v '^super.img.zst$')
 zip -0 -u "$GITHUB_WORKSPACE"/zip/marble_HyperT-${port_os_version}-BaSO4.zip super.img.zst
 sudo rm -rf "$GITHUB_WORKSPACE"/images
 End_Time 压缩卡刷包
