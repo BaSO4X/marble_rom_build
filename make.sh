@@ -170,13 +170,7 @@ echo "vendor_base_line=$vendor_base_line" >>$GITHUB_ENV
 ### 功能修复
 echo -e "${Red}- 开始功能修复"
 Start_Time
-echo "正在复制通用文件..."
-mkdir -p "$GITHUB_WORKSPACE"/images
-\cp -rf "$GITHUB_WORKSPACE"/files/common/* "$GITHUB_WORKSPACE"/images/
-echo "复制完成"
-echo "处理build.prop"
-cat "$GITHUB_WORKSPACE"/files/build.prop >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
-echo "处理完成"
+
 echo "精简apk"
 rm -rf "$GITHUB_WORKSPACE"/images/product/app/AnalyticsCore
 rm -rf "$GITHUB_WORKSPACE"/images/product/app/BSGameCenter
@@ -208,10 +202,20 @@ rm -rf "$GITHUB_WORKSPACE"/images/product/pangu/system/app/Nfc_st
 echo "精简apk完成"
 echo "正在执行特定机型操作..."
 if [ "$model" = "popsicle" ] || [ "$model" = "pandora" ] || [ "$model" = "pudding" ] || [ "$model" = "nezha" ]; then
+  echo "正在复制通用文件..."
+  mkdir -p "$GITHUB_WORKSPACE"/images
+  \cp -rf "$GITHUB_WORKSPACE"/files/common/* "$GITHUB_WORKSPACE"/images/
+  echo "处理build.prop"
+  cat "$GITHUB_WORKSPACE"/files/build.prop >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
   echo "ro.display.enable_pwm_switch=false" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
-  echo "persist.sys.enhance_vkpipelinecache.enable=false" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
+elif [ "$model" = "vermeer" ]; then
+
 else
-  echo "persist.sys.enhance_vkpipelinecache.enable=false" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
+  echo "正在复制通用文件..."
+  mkdir -p "$GITHUB_WORKSPACE"/images
+  \cp -rf "$GITHUB_WORKSPACE"/files/common/* "$GITHUB_WORKSPACE"/images/
+  echo "处理build.prop"
+  cat "$GITHUB_WORKSPACE"/files/build.prop >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
 fi
 echo "下载超过100mb的文件"
 curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*MiuiCamera\.apk' | xargs -I {} aria2c -x16 -s16 -o MiuiCamera.apk {} -d "${GITHUB_WORKSPACE}/images/product/priv-app/MIUICamera"

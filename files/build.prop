@@ -144,3 +144,6 @@ ro.miui.affinity.sfui=4-7
 ro.miui.affinity.sfre=4-7
 ro.miui.affinity.sfuireset=4-7
 persist.vendor.display.miui.composer_boost=4-7
+#vulkan
+persist.sys.enhance_vkpipelinecache.enable=false
+
