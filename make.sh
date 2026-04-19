@@ -165,6 +165,11 @@ echo "port_base_line=$port_base_line" >>$GITHUB_ENV
 vendor_base_line=$(grep "ro.vendor.build.id=" "$vendor_build_prop" | awk -F "=" '{print $2}')
 echo -e "${Blue}- 底包vendor基线版本: $vendor_base_line"
 echo "vendor_base_line=$vendor_base_line" >>$GITHUB_ENV
+# 增量版本号
+mi_ext_build_prop=$GITHUB_WORKSPACE/images/mi_ext/etc/build.prop
+incremental_version=$(grep "ro.mi.xms.version.incremental=" "$mi_ext_build_prop" | awk -F "=" '{print $2}')
+echo -e "${Blue}- 增量版本号: $incremental_version"
+echo "incremental_version=$incremental_version" >>$GITHUB_ENV
 ### 写入变量结束
 
 ### 功能修复
