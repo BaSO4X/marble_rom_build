@@ -307,7 +307,9 @@ End_Time 压缩super
 # 生成刷机包
 echo -e "${Red}- 生成刷机包"
 Start_Time
-sudo $a7z a -mx=1 "$GITHUB_WORKSPACE"/zip/marble_HyperT-${port_os_version}-BaSO4.zip "$GITHUB_WORKSPACE"/firmware/* >/dev/null
+cd "$GITHUB_WORKSPACE"/firmware
+zip -1 "$GITHUB_WORKSPACE"/zip/marble_HyperT-${port_os_version}-BaSO4.zip $(ls | grep -v '^super.img.zst$')
+zip -0 -u "$GITHUB_WORKSPACE"/zip/marble_HyperT-${port_os_version}-BaSO4.zip super.img.zst
 sudo rm -rf "$GITHUB_WORKSPACE"/images
 End_Time 压缩卡刷包
 # 定制 ROM 包名
