@@ -211,7 +211,7 @@ if [ "$model" = "popsicle" ] || [ "$model" = "pandora" ] || [ "$model" = "puddin
   cat "$GITHUB_WORKSPACE"/files/build.prop >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
   echo "ro.display.enable_pwm_switch=false" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
   curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*com\.android\.vndk\.v30\.apex' | xargs -I {} aria2c -x16 -s16 -o com.android.vndk.v30.apex {} -d "${GITHUB_WORKSPACE}/images/system_ext/apex"
-if [ "$model" = "vermeer" ] || [ "$model" = "fuxi" ] || [ "$model" = "nuwa" ] || [ "$model" = "ishtar" ]; then
+elif [ "$model" = "vermeer" ] || [ "$model" = "fuxi" ] || [ "$model" = "nuwa" ] || [ "$model" = "ishtar" ]; then
   echo "当前机型为8gen2系列 $model"
   echo "正在复制文件..."
   mkdir -p "$GITHUB_WORKSPACE"/images
