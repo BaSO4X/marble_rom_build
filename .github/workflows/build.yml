@@ -9,6 +9,10 @@ on:
         description: "底包下载地址"
         required: true
         default: 'https://bkt-sgp-miui-ota-update-alisgp.oss-ap-southeast-1.aliyuncs.com/OS3.0.1.0.VMRCNXM/marble-ota_full-OS3.0.1.0.VMRCNXM-user-15.0-ac8e5cc1cc.zip'
+      UPLOAD_ONEDRIVE:
+        description: '是否上传到 OneDrive'
+        required: true
+        type: boolean
 jobs:
   build:
     permissions:
@@ -54,3 +58,11 @@ jobs:
           allowUpdates: true
           artifactErrorsFailBuild: true
           token: ${{ secrets.GITHUB_TOKEN }}
+      - name: 上传到 OneDrive
+        if: ${{ github.event.inputs.UPLOAD_ONEDRIVE == 'true' }}
+        run: |
+          sudo -v ; curl https://rclone.org/install.sh | sudo bash
+          mkdir -p ~/.config/rclone/
+          echo ${{ secrets.RCLONE_CONFIG }} > base64.txt
+          base64 --decode base64.txt > ~/.config/rclone/rclone.conf
+          rclone copy -P "$GITHUB_WORKSPACE"/zip/${{ env.rom_name }} "odrive:/HyperT BaSO4/${{ env.port_os_version }}"
