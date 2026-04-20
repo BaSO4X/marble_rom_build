@@ -146,7 +146,4 @@ ro.miui.affinity.sfuireset=4-7
 persist.vendor.display.miui.composer_boost=4-7
 #vulkan
 persist.sys.enhance_vkpipelinecache.enable=false
-ro.build.version.security_patch=2026-04-01
-
-
 
