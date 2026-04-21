@@ -225,7 +225,6 @@ elif [ "$model" = "vermeer" ] || [ "$model" = "fuxi" ] || [ "$model" = "nuwa" ] 
   \cp -rf "$GITHUB_WORKSPACE"/files/8gen2/* "$GITHUB_WORKSPACE"/images/
   echo "处理build.prop"
   cat "$GITHUB_WORKSPACE"/files/8gen2_build.prop >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
-  rm -rf "$GITHUB_WORKSPACE"/images/product/app/Updater
 else
   echo "当前机型为其他机型 $model"
   echo "正在复制文件..."
