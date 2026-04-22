@@ -236,16 +236,6 @@ else
 fi
 echo "特定机型操作完成..."
 curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*MiuiCamera\.apk' | xargs -I {} aria2c -x16 -s16 -o MiuiCamera.apk {} -d "${GITHUB_WORKSPACE}/images/product/priv-app/MiuiCamera"
-echo "添加手电筒功能"
-7z e "$GITHUB_WORKSPACE"/images/product/app/MIUISystemUIPlugin/MIUISystemUIPlugin.apk classes3.dex -o"$GITHUB_WORKSPACE"/files/MIUISystemUIPlugin -y
-bash "$GITHUB_WORKSPACE"/files/MIUISystemUIPlugin/patch.sh
-cd "$GITHUB_WORKSPACE"/files/MIUISystemUIPlugin
-zip -u "$GITHUB_WORKSPACE"/images/product/app/MIUISystemUIPlugin/MIUISystemUIPlugin.apk classes3.dex
-mkdir -p "$GITHUB_WORKSPACE"/temp
-cp "$GITHUB_WORKSPACE"/images/product/app/MIUISystemUIPlugin/MIUISystemUIPlugin.apk "$GITHUB_WORKSPACE"/temp/MIUISystemUIPlugin.apk
-zipalign -f -p 4 "$GITHUB_WORKSPACE"/temp/MIUISystemUIPlugin.apk "$GITHUB_WORKSPACE"/temp/MIUISystemUIPlugin-tmp.apk
-cp "$GITHUB_WORKSPACE"/temp/MIUISystemUIPlugin-tmp.apk "$GITHUB_WORKSPACE"/images/product/app/MIUISystemUIPlugin/MIUISystemUIPlugin.apk
-rm -rf "$GITHUB_WORKSPACE"/temp
 End_Time 功能修复
 ### 功能修复结束
 
