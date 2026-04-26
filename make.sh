@@ -236,6 +236,27 @@ else
 fi
 echo "特定机型操作完成..."
 curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*MiuiCamera\.apk' | xargs -I {} aria2c -x16 -s16 -o MiuiCamera.apk {} -d "${GITHUB_WORKSPACE}/images/product/priv-app/MiuiCamera"
+if [ "$model" = "vermeer" ] || [ "$model" = "fuxi" ] || [ "$model" = "nuwa" ] || [ "$model" = "ishtar" ]; then
+  echo "跳过更换GPU驱动"
+else
+  echo "开始更换GPU驱动"
+  mkdir -p "$GITHUB_WORKSPACE"/images
+  \cp -rf "$GITHUB_WORKSPACE"/files/gpu_drivers/* "$GITHUB_WORKSPACE"/images/
+  echo "/vendor/lib/libllvm-qgl\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+  echo "vendor/lib/libllvm-qgl.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+  echo "/vendor/lib64/libllvm-qgl\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+  echo "vendor/lib64/libllvm-qgl.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+  echo "/vendor/lib/libdmabufheap\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+  echo "vendor/lib/libdmabufheap.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+  echo "/vendor/lib64/libdmabufheap\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+  echo "vendor/lib64/libdmabufheap.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+  echo "vendor/lib/egl/libVkLayer_ADRENO_qprofiler.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+  echo "/vendor/lib/egl/libVkLayer_ADRENO_qprofiler\.so u:object_r:system_lib_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+  echo "vendor/lib64/egl/libVkLayer_ADRENO_qprofiler.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+  echo "/vendor/lib64/egl/libVkLayer_ADRENO_qprofiler\.so u:object_r:system_lib_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+  echo "vendor/firmware/a650_sqe.fw 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+  echo "/vendor/firmware/a650_sqe\.fw u:object_r:system_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+fi
 End_Time 功能修复
 ### 功能修复结束
 
