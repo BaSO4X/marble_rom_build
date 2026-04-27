@@ -34,7 +34,6 @@ jobs:
       - name: 准备所需环境
         run: |
           sudo timedatectl set-timezone Asia/Shanghai
-          sudo apt-get install -y openjdk-21-jdk android-sdk-build-tools
           sudo apt-get install python3 aria2 p7zip-full zstd
           sudo pip install google protobuf
       - name: 构建 ROM
