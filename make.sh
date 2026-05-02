@@ -200,6 +200,7 @@ rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MIUIVideo
 rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MIUIVirtualSim
 rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MIUIYoupin
 rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MiRadio
+rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/TinyGame
 rm -rf "$GITHUB_WORKSPACE"/images/product/priv-app/MiniGameService
 rm -rf "$GITHUB_WORKSPACE"/images/product/priv-app/MIUIBrowser
 rm -rf "$GITHUB_WORKSPACE"/images/product/priv-app/AIService
