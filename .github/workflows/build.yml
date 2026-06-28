@@ -76,5 +76,5 @@ jobs:
             --retries-sleep=5s \
             --low-level-retries=20 \
             --timeout=5m \
-            --stats=10s \
-            --stats-one-line
+            --progress \
+            --log-level INFO
