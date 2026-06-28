@@ -64,4 +64,11 @@ jobs:
           mkdir -p ~/.config/rclone/
           echo ${{ secrets.RCLONE_CONFIG }} > base64.txt
           base64 --decode base64.txt > ~/.config/rclone/rclone.conf
-          rclone copy -P "$GITHUB_WORKSPACE"/zip/${{ env.rom_name }} "odrive:/HyperT BaSO4/${{ env.port_os_version }}"
+          rclone copyto \
+            "$GITHUB_WORKSPACE/zip/${{ env.rom_name }}" \
+            "odrive:/HyperT BaSO4/${{ env.port_os_version }}/${{ env.rom_name }}" \
+            --transfers=8 \
+            --onedrive-chunk-size=100M \
+            --buffer-size=64M \
+            --no-traverse \
+            --ignore-checksum
