@@ -68,7 +68,13 @@ jobs:
             "$GITHUB_WORKSPACE/zip/${{ env.rom_name }}" \
             "odrive:/HyperT BaSO4/${{ env.port_os_version }}/${{ env.rom_name }}" \
             --transfers=8 \
-            --onedrive-chunk-size=100M \
-            --buffer-size=64M \
+            --onedrive-chunk-size=250M \
+            --buffer-size=128M \
             --no-traverse \
-            --ignore-checksum
+            --ignore-checksum \
+            --retries=10 \
+            --retries-sleep=5s \
+            --low-level-retries=20 \
+            --timeout=5m \
+            --stats=10s \
+            --stats-one-line
