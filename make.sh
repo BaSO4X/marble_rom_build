@@ -189,7 +189,6 @@ rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/Health
 rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/iFlytekIME
 rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MIGalleryLockscreen
 rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MIpay
-rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MIService
 rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MiShop
 rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MIUIDuokanReader
 rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/MIUIEmail
@@ -205,7 +204,6 @@ rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/TinyGame
 rm -rf "$GITHUB_WORKSPACE"/images/product/priv-app/MiniGameService
 rm -rf "$GITHUB_WORKSPACE"/images/product/priv-app/MIUIBrowser
 rm -rf "$GITHUB_WORKSPACE"/images/product/priv-app/AIService
-rm -rf "$GITHUB_WORKSPACE"/images/product/priv-app/MIService
 rm -rf "$GITHUB_WORKSPACE"/images/product/priv-app/MiuiCamera
 rm -rf "$GITHUB_WORKSPACE"/images/product/pangu/system/app/Nfc_st
 rm -rf "$GITHUB_WORKSPACE"/images/mi_ext/product/ai/taiyi
