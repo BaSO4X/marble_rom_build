@@ -208,55 +208,31 @@ rm -rf "$GITHUB_WORKSPACE"/images/product/priv-app/MiuiCamera
 rm -rf "$GITHUB_WORKSPACE"/images/product/pangu/system/app/Nfc_st
 rm -rf "$GITHUB_WORKSPACE"/images/mi_ext/product/ai/taiyi
 echo "精简apk完成"
-echo "正在执行特定机型操作..."
-if [ "$model" = "popsicle" ] || [ "$model" = "pandora" ] || [ "$model" = "pudding" ] || [ "$model" = "nezha" ]; then
-  echo "当前机型为17系列 $model"
-  echo "正在复制文件..."
-  mkdir -p "$GITHUB_WORKSPACE"/images
-  \cp -rf "$GITHUB_WORKSPACE"/files/common/* "$GITHUB_WORKSPACE"/images/
-  echo "处理build.prop"
-  cat "$GITHUB_WORKSPACE"/files/build.prop >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
-  echo "ro.display.enable_pwm_switch=false" >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
-  curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*com\.android\.vndk\.v30\.apex' | xargs -I {} aria2c -x16 -s16 -o com.android.vndk.v30.apex {} -d "${GITHUB_WORKSPACE}/images/system_ext/apex"
-elif [ "$model" = "vermeer" ] || [ "$model" = "fuxi" ] || [ "$model" = "nuwa" ] || [ "$model" = "ishtar" ]; then
-  echo "当前机型为8gen2系列 $model"
-  echo "正在复制文件..."
-  mkdir -p "$GITHUB_WORKSPACE"/images
-  \cp -rf "$GITHUB_WORKSPACE"/files/8gen2/* "$GITHUB_WORKSPACE"/images/
-  echo "处理build.prop"
-  cat "$GITHUB_WORKSPACE"/files/8gen2_build.prop >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
-else
-  echo "当前机型为其他机型 $model"
-  echo "正在复制文件..."
-  mkdir -p "$GITHUB_WORKSPACE"/images
-  \cp -rf "$GITHUB_WORKSPACE"/files/common/* "$GITHUB_WORKSPACE"/images/
-  echo "处理build.prop"
-  cat "$GITHUB_WORKSPACE"/files/build.prop >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
-  curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*com\.android\.vndk\.v30\.apex' | xargs -I {} aria2c -x16 -s16 -o com.android.vndk.v30.apex {} -d "${GITHUB_WORKSPACE}/images/system_ext/apex"
-fi
-echo "特定机型操作完成..."
+echo "当前机型为 $model"
+echo "正在复制文件..."
+mkdir -p "$GITHUB_WORKSPACE"/images
+\cp -rf "$GITHUB_WORKSPACE"/files/common/* "$GITHUB_WORKSPACE"/images/
+echo "处理build.prop"
+cat "$GITHUB_WORKSPACE"/files/build.prop >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
+curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*com\.android\.vndk\.v30\.apex' | xargs -I {} aria2c -x16 -s16 -o com.android.vndk.v30.apex {} -d "${GITHUB_WORKSPACE}/images/system_ext/apex"
 curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*MiuiCamera\.apk' | xargs -I {} aria2c -x16 -s16 -o MiuiCamera.apk {} -d "${GITHUB_WORKSPACE}/images/product/priv-app/MiuiCamera"
-if [ "$model" = "vermeer" ] || [ "$model" = "fuxi" ] || [ "$model" = "nuwa" ] || [ "$model" = "ishtar" ]; then
-  echo "跳过更换GPU驱动"
-else
-  echo "开始更换GPU驱动"
-  mkdir -p "$GITHUB_WORKSPACE"/images
-  \cp -rf "$GITHUB_WORKSPACE"/files/gpu_drivers/* "$GITHUB_WORKSPACE"/images/
-  echo "/vendor/lib/libllvm-qgl\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
-  echo "vendor/lib/libllvm-qgl.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
-  echo "/vendor/lib64/libllvm-qgl\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
-  echo "vendor/lib64/libllvm-qgl.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
-  echo "/vendor/lib/libdmabufheap\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
-  echo "vendor/lib/libdmabufheap.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
-  echo "/vendor/lib64/libdmabufheap\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
-  echo "vendor/lib64/libdmabufheap.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
-  echo "vendor/lib/egl/libVkLayer_ADRENO_qprofiler.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
-  echo "/vendor/lib/egl/libVkLayer_ADRENO_qprofiler\.so u:object_r:system_lib_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
-  echo "vendor/lib64/egl/libVkLayer_ADRENO_qprofiler.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
-  echo "/vendor/lib64/egl/libVkLayer_ADRENO_qprofiler\.so u:object_r:system_lib_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
-  echo "vendor/firmware/a650_sqe.fw 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
-  echo "/vendor/firmware/a650_sqe\.fw u:object_r:system_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
-fi
+echo "开始更换GPU驱动"
+mkdir -p "$GITHUB_WORKSPACE"/images
+\cp -rf "$GITHUB_WORKSPACE"/files/gpu_drivers/* "$GITHUB_WORKSPACE"/images/
+echo "/vendor/lib/libllvm-qgl\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib/libllvm-qgl.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib64/libllvm-qgl\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/libllvm-qgl.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib/libdmabufheap\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib/libdmabufheap.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib64/libdmabufheap\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/libdmabufheap.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "vendor/lib/egl/libVkLayer_ADRENO_qprofiler.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib/egl/libVkLayer_ADRENO_qprofiler\.so u:object_r:system_lib_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/egl/libVkLayer_ADRENO_qprofiler.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib64/egl/libVkLayer_ADRENO_qprofiler\.so u:object_r:system_lib_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/firmware/a650_sqe.fw 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/firmware/a650_sqe\.fw u:object_r:system_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
 End_Time 功能修复
 ### 功能修复结束
 
