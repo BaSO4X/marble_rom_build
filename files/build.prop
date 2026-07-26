@@ -147,6 +147,4 @@ persist.vendor.display.miui.composer_boost=4-7
 #vulkan
 persist.sys.enhance_vkpipelinecache.enable=false
 ro.display.enable_pwm_switch=false
-ro.build.version.security_patch=2026-06-01
-
 
