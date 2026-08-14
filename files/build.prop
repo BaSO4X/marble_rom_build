@@ -147,4 +147,8 @@ persist.vendor.display.miui.composer_boost=4-7
 #vulkan
 persist.sys.enhance_vkpipelinecache.enable=false
 ro.display.enable_pwm_switch=false
-
+debug.renderengine.vulkan=true
+debug.hwui.renderer=skiavk
+ro.hwui.use_vulkan=true
+debug.renderengine.backend=skiavkthreaded
+debug.stagefright.renderengine.backend=threaded
