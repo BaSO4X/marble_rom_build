@@ -214,6 +214,42 @@ echo "处理build.prop"
 cat "$GITHUB_WORKSPACE"/files/build.prop >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
 curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*com\.android\.vndk\.v30\.apex' | xargs -I {} aria2c -x16 -s16 -o com.android.vndk.v30.apex {} -d "${GITHUB_WORKSPACE}/images/system_ext/apex"
 curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*MiuiCamera\.apk' | xargs -I {} aria2c -x16 -s16 -o MiuiCamera.apk {} -d "${GITHUB_WORKSPACE}/images/product/priv-app/MiuiCamera"
+#修改miui-services.jar
+echo -e "${Red}- 开始修改miui-services.jar${NC}"
+Start_Time
+services_jar="$GITHUB_WORKSPACE"/images/system_ext/framework/miui-services.jar
+tools_dir="$GITHUB_WORKSPACE"/tools/smali_patch
+work_dir="$GITHUB_WORKSPACE"/temp_services_patch
+if [ ! -f "$services_jar" ]; then
+    echo -e "${Yellow}- 警告: 未找到miui-services.jar，跳过修改${NC}"
+elif [ ! -f "$tools_dir/baksmali.jar" ] || [ ! -f "$tools_dir/smali.jar" ]; then
+    echo -e "${Yellow}- 警告: 缺少baksmali.jar或smali.jar${NC}"
+else
+    echo -e "${Red}- 正在处理: miui-services.jar${NC}"
+    rm -rf "$work_dir"
+    if java -jar "$tools_dir/baksmali.jar" d "$services_jar" -o "$work_dir" >/dev/null 2>&1; then
+        smali_tgt=$(find "$work_dir" -iname "VibratorManagerServiceImpl.smali" | head -n 1)
+        if [ -z "$smali_tgt" ]; then
+            echo -e "${Yellow}- 警告: 未找到VibratorManagerServiceImpl.smali${NC}"
+        elif grep -qF '"android.hardware.vibrator.IVibrator/default"' "$smali_tgt"; then
+            echo -e "${Yellow}- 跳过: 已修改miui-services.jar${NC}"
+        else
+            sed -i 's/const v1, 0x31708/const v1, 0x20/' "$smali_tgt"
+            sed -i 's/const v2, 0x31708/const v2, 0x20/' "$smali_tgt"
+            sed -i 's|const-string v1, "android.hardware.vibrator.IVibrator/vibratorfeature"|const-string v1, "android.hardware.vibrator.IVibrator/default"|' "$smali_tgt"
+            if grep -qF '"android.hardware.vibrator.IVibrator/default"' "$smali_tgt" && \
+               java -jar "$tools_dir/smali.jar" a "$work_dir" -o "$work_dir/classes.dex" >/dev/null 2>&1; then
+                zip -j -u -q "$services_jar" "$work_dir/classes.dex"
+                echo -e "${Green}- miui-services.jar修改成功${NC}"
+            else
+                echo -e "${Yellow}- 警告: 替换验证失败或classes.dex回编译失败${NC}"
+            fi
+        fi
+    else
+        echo -e "${Yellow}- 警告: baksmali反编译失败${NC}"
+    fi
+    rm -rf "$work_dir"
+fi
 echo "开始更换GPU驱动"
 mkdir -p "$GITHUB_WORKSPACE"/images
 \cp -rf "$GITHUB_WORKSPACE"/files/gpu_drivers/* "$GITHUB_WORKSPACE"/images/
