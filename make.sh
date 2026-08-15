@@ -231,13 +231,13 @@ else
         smali_tgt=$(find "$work_dir" -iname "VibratorManagerServiceImpl.smali" | head -n 1)
         if [ -z "$smali_tgt" ]; then
             echo -e "${Yellow}- 警告: 未找到VibratorManagerServiceImpl.smali${NC}"
-        elif grep -qF '"android.hardware.vibrator.IVibrator/default"' "$smali_tgt"; then
-            echo -e "${Yellow}- 跳过: 已修改miui-services.jar${NC}"
+        elif ! grep -qF '"android.hardware.vibrator.IVibrator/vibratorfeature"' "$smali_tgt"; then
+            echo -e "${Yellow}- 跳过: 未找到vibratorfeature，已修改${NC}"
         else
             sed -i 's/const v1, 0x31708/const v1, 0x20/' "$smali_tgt"
             sed -i 's/const v2, 0x31708/const v2, 0x20/' "$smali_tgt"
             sed -i 's|const-string v1, "android.hardware.vibrator.IVibrator/vibratorfeature"|const-string v1, "android.hardware.vibrator.IVibrator/default"|' "$smali_tgt"
-            if grep -qF '"android.hardware.vibrator.IVibrator/default"' "$smali_tgt" && \
+            if ! grep -qF '"android.hardware.vibrator.IVibrator/vibratorfeature"' "$smali_tgt" && \
                java -jar "$tools_dir/smali.jar" a "$work_dir" -o "$work_dir/classes.dex" >/dev/null 2>&1; then
                 zip -j -u -q "$services_jar" "$work_dir/classes.dex"
                 echo -e "${Green}- miui-services.jar修改成功${NC}"
