@@ -205,6 +205,9 @@ rm -rf "$GITHUB_WORKSPACE"/images/product/priv-app/MiniGameService
 rm -rf "$GITHUB_WORKSPACE"/images/product/priv-app/MIUIBrowser
 rm -rf "$GITHUB_WORKSPACE"/images/product/priv-app/MiuiCamera
 rm -rf "$GITHUB_WORKSPACE"/images/product/pangu/system/app/Nfc_st
+rm -rf "$GITHUB_WORKSPACE"/images/system_ext/framework/oat/arm64/miui-services.odex
+rm -rf "$GITHUB_WORKSPACE"/images/system_ext/framework/oat/arm64/miui-services.vdex
+rm -rf "$GITHUB_WORKSPACE"/images/system_ext/framework/oat/arm64/miui-services.art
 echo "精简apk完成"
 echo "当前机型为 $model"
 echo "正在复制文件..."
