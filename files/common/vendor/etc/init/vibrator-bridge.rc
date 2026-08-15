@@ -1,0 +1,6 @@
+service vibrator-bridge /vendor/bin/hw/vibrator-bridge
+    interface aidl android.hardware.vibrator.IVibrator/default
+    class hal
+    user system
+    group system
+    onrestart restart vibratorfeature-hal-service

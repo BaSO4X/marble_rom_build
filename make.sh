@@ -231,6 +231,26 @@ echo "vendor/lib64/egl/libVkLayer_ADRENO_qprofiler.so 0 0 0644" | sudo tee -a "$
 echo "/vendor/lib64/egl/libVkLayer_ADRENO_qprofiler\.so u:object_r:system_lib_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
 echo "vendor/firmware/a650_sqe.fw 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
 echo "/vendor/firmware/a650_sqe\.fw u:object_r:system_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "开始添加红外遥控服务"
+echo "/vendor/bin/hw/android\.hardware\.ir@1\.0-service u:object_r:hal_ir_default_exec:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/bin/hw/android.hardware.ir@1.0-service 0 2000 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/etc/init/android\.hardware\.ir@1\.0-service\.rc u:object_r:vendor_configs_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/etc/init/android.hardware.ir@1.0-service.rc 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/etc/vintf/manifest/android\.hardware\.ir-service\.xml u:object_r:vendor_configs_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/etc/vintf/manifest/android.hardware.ir-service.xml 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/etc/permissions/android\.hardware\.consumerir\.xml u:object_r:vendor_configs_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/etc/permissions/android.hardware.consumerir.xml 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "开始添加振动桥服务"
+echo "/vendor/bin/hw/vibrator-bridge u:object_r:hal_vibrator_default_exec:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/bin/hw/vibrator-bridge 0 2000 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/etc/init/vibrator-bridge\.rc u:object_r:vendor_configs_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/etc/init/vibrator-bridge.rc 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/etc/vintf/manifest/vibrator-bridge\.xml u:object_r:vendor_configs_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/etc/vintf/manifest/vibrator-bridge.xml 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "开始添加selinux策略"
+echo "(allow hal_vibrator_default hal_vibrator_default (binder (call transfer)))" | sudo tee -a "$GITHUB_WORKSPACE"/images/vendor/etc/selinux/vendor_sepolicy.cil
+echo "(typepermissive hal_vibrator_default)" | sudo tee -a "$GITHUB_WORKSPACE"/images/vendor/etc/selinux/vendor_sepolicy.cil
+echo "(typepermissive hal_ir_default)" | sudo tee -a "$GITHUB_WORKSPACE"/images/vendor/etc/selinux/vendor_sepolicy.cil
 End_Time 功能修复
 ### 功能修复结束
 
