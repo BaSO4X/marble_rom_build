@@ -126,6 +126,8 @@ persist.vendor.accelerate.charge=true
 #NFC读卡提醒2.0
 ro.vendor.nfc.dispatch_optim=2
 #dex2oat
+persist.miui.dexopt.first_use=true
+dalvik.vm.enable_pr_dexopt=true
 dalvik.vm.boot-dex2oat-cpu-set=0,1,2,3,4,5,6,7
 dalvik.vm.background-dex2oat-cpu-set=0,1,2,3,4,5,6,7
 #音质音效
@@ -146,5 +148,8 @@ ro.miui.affinity.sfuireset=4-7
 persist.vendor.display.miui.composer_boost=4-7
 #vulkan
 persist.sys.enhance_vkpipelinecache.enable=false
+#不显示pwm开关
 ro.display.enable_pwm_switch=false
-
+#修复锁屏模糊闪退
+ro.hwui.use_vulkan=true
+debug.hwui.renderer=skiavk

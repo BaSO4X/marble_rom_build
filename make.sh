@@ -181,8 +181,8 @@ rm -rf "$GITHUB_WORKSPACE"/images/product/app/BSGameCenter
 rm -rf "$GITHUB_WORKSPACE"/images/product/app/HybridPlatform
 rm -rf "$GITHUB_WORKSPACE"/images/product/app/MiTrustService
 rm -rf "$GITHUB_WORKSPACE"/images/product/app/subscreencenter
-rm -rf "$GITHUB_WORKSPACE"/images/product/app/VoiceTrigger
 rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/OS2VipAccount
+rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/OS4VipAccount
 rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/SmartHome
 rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/BaiduIME
 rm -rf "$GITHUB_WORKSPACE"/images/product/data-app/Health
