@@ -217,20 +217,118 @@ curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -
 echo "开始更换GPU驱动"
 mkdir -p "$GITHUB_WORKSPACE"/images
 \cp -rf "$GITHUB_WORKSPACE"/files/gpu_drivers/* "$GITHUB_WORKSPACE"/images/
-echo "/vendor/lib/libllvm-qgl\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
-echo "vendor/lib/libllvm-qgl.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
-echo "/vendor/lib64/libllvm-qgl\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
-echo "vendor/lib64/libllvm-qgl.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+# vendor/lib/*.so → same_process_hal_file:s0 0755
+echo "/vendor/lib/libCB\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib/libCB.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib/libOpenCL\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib/libOpenCL.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib/libOpenCL_adreno\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib/libOpenCL_adreno.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib/libadreno_app_profiles\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib/libadreno_app_profiles.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib/libadreno_compiler_cl\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib/libadreno_compiler_cl.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib/libadreno_utils\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib/libadreno_utils.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
 echo "/vendor/lib/libdmabufheap\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
-echo "vendor/lib/libdmabufheap.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "vendor/lib/libdmabufheap.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib/libgsl\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib/libgsl.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib/libkcl\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib/libkcl.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib/libkernelmanager\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib/libkernelmanager.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib/libllvm-glnext\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib/libllvm-glnext.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib/libllvm-qcom\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib/libllvm-qcom.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib/libllvm-qgl\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib/libllvm-qgl.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+# vendor/lib64/*.so → same_process_hal_file:s0 0755
+echo "/vendor/lib64/libCB\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/libCB.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib64/libOpenCL\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/libOpenCL.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib64/libOpenCL_adreno\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/libOpenCL_adreno.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib64/libadreno_app_profiles\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/libadreno_app_profiles.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib64/libadreno_compiler_cl\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/libadreno_compiler_cl.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib64/libadreno_utils\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/libadreno_utils.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
 echo "/vendor/lib64/libdmabufheap\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
-echo "vendor/lib64/libdmabufheap.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
-echo "vendor/lib/egl/libVkLayer_ADRENO_qprofiler.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
-echo "/vendor/lib/egl/libVkLayer_ADRENO_qprofiler\.so u:object_r:system_lib_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
-echo "vendor/lib64/egl/libVkLayer_ADRENO_qprofiler.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
-echo "/vendor/lib64/egl/libVkLayer_ADRENO_qprofiler\.so u:object_r:system_lib_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
-echo "vendor/firmware/a650_sqe.fw 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
-echo "/vendor/firmware/a650_sqe\.fw u:object_r:system_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/libdmabufheap.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib64/libgsl\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/libgsl.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib64/libkcl\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/libkcl.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib64/libkernelmanager\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/libkernelmanager.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib64/libllvm-glnext\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/libllvm-glnext.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib64/libllvm-qcom\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/libllvm-qcom.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib64/libllvm-qgl\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/libllvm-qgl.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+# vendor/lib/egl/*.so → same_process_hal_file:s0 0755
+echo "/vendor/lib/egl/eglSubDriverAndroid\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib/egl/eglSubDriverAndroid.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib/egl/libEGL_adreno\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib/egl/libEGL_adreno.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib/egl/libGLESv1_CM_adreno\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib/egl/libGLESv1_CM_adreno.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib/egl/libGLESv2_adreno\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib/egl/libGLESv2_adreno.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib/egl/libVkLayer_ADRENO_qprofiler\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib/egl/libVkLayer_ADRENO_qprofiler.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib/egl/libq3dtools_adreno\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib/egl/libq3dtools_adreno.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib/egl/libq3dtools_esx\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib/egl/libq3dtools_esx.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+# vendor/lib/hw/*.so → same_process_hal_file:s0 0755
+echo "/vendor/lib/hw/vulkan\.adreno\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib/hw/vulkan.adreno.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+# vendor/lib64/egl/*.so → same_process_hal_file:s0 0755
+echo "/vendor/lib64/egl/eglSubDriverAndroid\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/egl/eglSubDriverAndroid.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib64/egl/libEGL_adreno\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/egl/libEGL_adreno.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib64/egl/libGLESv1_CM_adreno\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/egl/libGLESv1_CM_adreno.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib64/egl/libGLESv2_adreno\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/egl/libGLESv2_adreno.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib64/egl/libVkLayer_ADRENO_qprofiler\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/egl/libVkLayer_ADRENO_qprofiler.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib64/egl/libq3dtools_adreno\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/egl/libq3dtools_adreno.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib64/egl/libq3dtools_esx\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/egl/libq3dtools_esx.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+# vendor/lib64/hw/*.so → same_process_hal_file:s0 0755
+echo "/vendor/lib64/hw/vulkan\.adreno\.so u:object_r:same_process_hal_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/hw/vulkan.adreno.so 0 0 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+# vendor/etc/permissions/*.xml → vendor_configs_file:s0 0644
+echo "/vendor/etc/permissions/android\.hardware\.opengles\.aep\.xml u:object_r:vendor_configs_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/etc/permissions/android.hardware.opengles.aep.xml 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/etc/permissions/android\.hardware\.vulkan\.version-1_1\.xml u:object_r:vendor_configs_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/etc/permissions/android.hardware.vulkan.version-1_1.xml 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/etc/permissions/android\.hardware\.vulkan\.version-1_3\.xml u:object_r:vendor_configs_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/etc/permissions/android.hardware.vulkan.version-1_3.xml 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/etc/permissions/android\.software\.opengles\.deqp\.level\.xml u:object_r:vendor_configs_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/etc/permissions/android.software.opengles.deqp.level.xml 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/etc/permissions/android\.software\.tuning-1\.xml u:object_r:vendor_configs_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/etc/permissions/android.software.tuning-1.xml 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/etc/permissions/android\.software\.vulkan\.deqp\.level\.xml u:object_r:vendor_configs_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/etc/permissions/android.software.vulkan.deqp.level.xml 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+# vendor/firmware/*.fw → system_file:s0 0644
+echo "/vendor/firmware/a660_sqe\.fw u:object_r:system_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/firmware/a660_sqe.fw 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/firmware/a730_sqe\.fw u:object_r:system_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/firmware/a730_sqe.fw 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/firmware/a740v3_sqe\.fw u:object_r:system_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/firmware/a740v3_sqe.fw 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/firmware/gen71100_sqe\.fw u:object_r:system_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/firmware/gen71100_sqe.fw 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
 echo "开始添加红外遥控服务"
 echo "/vendor/bin/hw/android\.hardware\.ir@1\.0-service u:object_r:hal_ir_default_exec:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
 echo "vendor/bin/hw/android.hardware.ir@1.0-service 0 2000 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
