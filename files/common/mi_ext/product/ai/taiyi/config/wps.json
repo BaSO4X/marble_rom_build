@@ -1,0 +1,13 @@
+{
+  "api" : "wps",
+  "name" : "wps",
+  "version" : 1,
+  "plugin" : {
+    "id" : "wps",
+    "version" : 1,
+    "entry" : "com.xiaomi.taiyi.plugin.wps.WpsPlugin"
+  },
+  "isLLM" : false,
+  "disabled" : false,
+  "type" : 0
+}

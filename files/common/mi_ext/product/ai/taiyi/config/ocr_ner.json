@@ -1,0 +1,6 @@
+{
+  "api": "ocr_ner",
+  "name": "ocr_ner",
+  "version": 1,
+  "filter": ["ocr","ner"]
+}

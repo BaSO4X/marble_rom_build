@@ -1,0 +1,14 @@
+{
+  "parent" : "framework_compat",
+  "api" : "qcom_qnn",
+  "name" : "qcom_qnn_v2_36_0_v73",
+  "version" : 4,
+  "plugin" : {
+    "id" : "qcom_qnn_v2_36_0_v73",
+    "version" : 3,
+    "entry" : "com.xiaomi.taiyi.plugin.qcomqnn.QCOMQnnPlugin"
+  },
+  "isLLM" : false,
+  "disabled" : false,
+  "type" : 0
+}

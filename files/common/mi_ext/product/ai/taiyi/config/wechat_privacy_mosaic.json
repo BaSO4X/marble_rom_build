@@ -1,0 +1,6 @@
+{
+  "api": "wechat_privacy_mosaic",
+  "name": "wechat_privacy_mosaic",
+  "version": 1,
+  "filter": ["ocr","ner", "wechat_privacy"]
+}
