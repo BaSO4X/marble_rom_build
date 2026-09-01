@@ -1,0 +1,10 @@
+# Release the bind mount before a userspace reboot, it pins com.android.bt's
+# loop device and would obstruct an APEX teardown.
+on userspace-reboot-requested
+    umount /apex/com.android.bt/lib64/libbluetooth_jni.so
+
+# apex.all.ready fires again after every userspace reboot, so unmount first to
+# keep the bind mount idempotent instead of stacking.
+on property:apex.all.ready=true
+    umount /apex/com.android.bt/lib64/libbluetooth_jni.so
+    mount none /system/lib64/libbluetooth_jni.marble.so /apex/com.android.bt/lib64/libbluetooth_jni.so bind

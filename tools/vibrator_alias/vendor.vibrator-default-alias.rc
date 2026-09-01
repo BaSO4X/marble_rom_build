@@ -1,0 +1,5 @@
+service vendor.vibrator-default-alias /vendor/bin/hw/vendor.vibrator-default-alias
+    interface aidl android.hardware.vibrator.IVibrator/default
+    class hal
+    user system
+    group system
