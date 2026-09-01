@@ -42,6 +42,7 @@ jobs:
           sudo timedatectl set-timezone Asia/Shanghai
           sudo apt-get install python3 aria2 curl patchelf p7zip-full zstd
           sudo pip install google protobuf
+          rustup target add aarch64-linux-android
       - name: 构建 ROM
         run: |
           sudo bash "$GITHUB_WORKSPACE"/make.sh ${{ github.event.inputs.URL }} ${{ github.event.inputs.VENDOR_URL }} $GITHUB_ENV $GITHUB_WORKSPACE ${{ steps.setup-ndk.outputs.ndk-path }} $(rustup which cargo)
