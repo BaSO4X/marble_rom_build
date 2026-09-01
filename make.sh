@@ -4,6 +4,8 @@ URL="$1"              # 移植包下载地址
 VENDOR_URL="$2"       # 底包下载地址
 GITHUB_ENV="$3"       # 输出环境变量
 GITHUB_WORKSPACE="$4" # 工作目录
+ANDROID_NDK="${5:-}"  # Android NDK 路径
+CARGO="${6:-cargo}"   # Rust Cargo 路径
 
 Red='\033[1;31m'    # 粗体红色
 Yellow='\033[1;33m' # 粗体黄色
@@ -215,6 +217,215 @@ echo "处理build.prop"
 cat "$GITHUB_WORKSPACE"/files/build.prop >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
 curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*com\.android\.vndk\.v30\.apex' | xargs -I {} aria2c -x16 -s16 -o com.android.vndk.v30.apex {} -d "${GITHUB_WORKSPACE}/images/system_ext/apex"
 curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/12t | grep -o 'https://[^"]*MiuiCamera\.apk' | xargs -I {} aria2c -x16 -s16 -o MiuiCamera.apk {} -d "${GITHUB_WORKSPACE}/images/product/priv-app/MiuiCamera"
+# 将底包的 legacy Consumer IR 模块接入 Android 17 AIDL framework
+echo -e "${Red}- 添加 Consumer IR AIDL 适配服务"
+consumer_ir_dir="$GITHUB_WORKSPACE"/tools/consumer_ir_aidl
+consumer_ir_binary="$GITHUB_WORKSPACE"/images/vendor/bin/hw/android.hardware.ir@1.0-service
+consumer_ir_rc="$GITHUB_WORKSPACE"/images/vendor/etc/init/android.hardware.ir@1.0-service.rc
+consumer_ir_feature="$GITHUB_WORKSPACE"/images/vendor/etc/permissions/android.hardware.consumerir.xml
+mapfile -t consumer_ir_manifests < <(sudo find \
+  "$GITHUB_WORKSPACE"/images/vendor/etc/vintf \
+  "$GITHUB_WORKSPACE"/images/odm/etc/vintf \
+  -maxdepth 1 -type f -name "manifest_${device}.xml" 2>/dev/null)
+if [[ ${#consumer_ir_manifests[@]} -ne 1 ]]; then
+  echo -e "${Red}- 无法唯一定位 manifest_${device}.xml，实际找到 ${#consumer_ir_manifests[@]} 个"
+  exit 1
+fi
+consumer_ir_manifest=${consumer_ir_manifests[0]}
+for consumer_ir_required_file in \
+  "$consumer_ir_binary" \
+  "$consumer_ir_rc" \
+  "$consumer_ir_manifest" \
+  "$consumer_ir_feature" \
+  "$GITHUB_WORKSPACE"/images/vendor/lib64/hw/consumerir.qcom.so \
+  "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts \
+  "$GITHUB_WORKSPACE"/images/config/vendor_fs_config; do
+  if [[ ! -f "$consumer_ir_required_file" ]]; then
+    echo -e "${Red}- Consumer IR AIDL 适配缺少底包文件: $consumer_ir_required_file"
+    exit 1
+  fi
+done
+if ! sudo grep -Eq '<feature[[:space:]][^>]*name="android\.hardware\.consumerir"' \
+  "$consumer_ir_feature"; then
+  echo -e "${Red}- Consumer IR feature XML 未声明 android.hardware.consumerir"
+  exit 1
+fi
+if ! sudo grep -Eq 'ir@1.*hal_ir_default_exec' \
+  "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts || \
+  ! sudo grep -Eq '^vendor/bin/hw/android\.hardware\.ir@1\.0-service[[:space:]]' \
+    "$GITHUB_WORKSPACE"/images/config/vendor_fs_config; then
+  echo -e "${Red}- Consumer IR 服务缺少既有 hal_ir_default SELinux 或文件元数据"
+  exit 1
+fi
+if ! sudo "$consumer_ir_dir"/build.sh "$ANDROID_NDK" "$consumer_ir_binary"; then
+  echo -e "${Red}- Consumer IR AIDL 服务编译失败"
+  exit 1
+fi
+if ! sudo cp -f "$consumer_ir_dir"/android.hardware.ir-service.marble.rc "$consumer_ir_rc"; then
+  echo -e "${Red}- Consumer IR AIDL init 配置替换失败"
+  exit 1
+fi
+if ! sudo grep -Fq 'interface aidl android.hardware.ir.IConsumerIr/default' "$consumer_ir_rc" || \
+  sudo grep -Fq 'interface android.hardware.ir@1.0::IConsumerIr' "$consumer_ir_rc"; then
+  echo -e "${Red}- Consumer IR AIDL init 配置校验失败"
+  exit 1
+fi
+if ! sudo python3 "$consumer_ir_dir"/update_vintf.py "$consumer_ir_manifest"; then
+  echo -e "${Red}- Consumer IR VINTF 清单更新失败"
+  exit 1
+fi
+if ! sudo python3 -c 'import sys; from xml.etree import ElementTree as ET; ET.parse(sys.argv[1])' \
+  "$consumer_ir_manifest" || \
+  [[ $(sudo grep -c '<fqname>IConsumerIr/default</fqname>' "$consumer_ir_manifest") -ne 1 ]] || \
+  sudo grep -q '@1.0::IConsumerIr' "$consumer_ir_manifest"; then
+  echo -e "${Red}- Consumer IR AIDL VINTF 校验失败"
+  exit 1
+fi
+# 从源码构建 marble/VNDK 32 Bluetooth Audio profile 并接入正式镜像。
+echo -e "${Red}- 添加 Bluetooth Audio AIDL 适配"
+bluetooth_audio_rom_dir="$GITHUB_WORKSPACE"/tools/bluetooth_audio_aidl_bridge/rom_integration
+if ! sudo bash "$bluetooth_audio_rom_dir"/build_and_install.sh \
+  "$ANDROID_NDK" \
+  "$CARGO" \
+  "$a7z" \
+  "$GITHUB_WORKSPACE"/images \
+  "$GITHUB_WORKSPACE"/images/system/system \
+  "$GITHUB_WORKSPACE"/images/config \
+  "$device"; then
+  echo -e "${Red}- Bluetooth Audio AIDL 正式镜像接入失败"
+  exit 1
+fi
+# 为 Android framework 提供 IVibrator/default 兼容代理
+vibrator_vintf_roots=()
+for vibrator_vintf_root in \
+  "$GITHUB_WORKSPACE"/images/vendor/etc/vintf \
+  "$GITHUB_WORKSPACE"/images/odm/etc/vintf; do
+  if [[ -d "$vibrator_vintf_root" ]]; then
+    vibrator_vintf_roots+=("$vibrator_vintf_root")
+  fi
+done
+if [[ ${#vibrator_vintf_roots[@]} -eq 0 ]]; then
+  echo -e "${Red}- 未找到 vendor/odm VINTF 目录"
+  exit 1
+fi
+
+vibrator_default_pattern='<fqname>[[:space:]]*IVibrator/default[[:space:]]*</fqname>'
+mapfile -t vibrator_default_manifests < <(sudo grep -rlE --include='*.xml' -- \
+  "$vibrator_default_pattern" "${vibrator_vintf_roots[@]}" 2>/dev/null)
+vibrator_default_count=$(sudo grep -RhoE --include='*.xml' -- \
+  "$vibrator_default_pattern" "${vibrator_vintf_roots[@]}" 2>/dev/null | wc -l || true)
+if [[ $vibrator_default_count -gt 1 ]]; then
+  echo -e "${Red}- 检测到 ${vibrator_default_count} 个 IVibrator/default VINTF 声明，拒绝继续"
+  exit 1
+fi
+if [[ $vibrator_default_count -eq 1 && ${#vibrator_default_manifests[@]} -ne 1 ]]; then
+  echo -e "${Red}- IVibrator/default VINTF 声明位置无法唯一确定"
+  exit 1
+fi
+if [[ $vibrator_default_count -eq 1 ]]; then
+  if ! sudo python3 -c 'import sys; from xml.etree import ElementTree as ET; ET.parse(sys.argv[1])' \
+    "${vibrator_default_manifests[0]}"; then
+    echo -e "${Red}- 已有 IVibrator/default 的 VINTF 清单不是合法 XML"
+    exit 1
+  fi
+  echo -e "${Green}- 底包已经提供 IVibrator/default，跳过 Binder 别名服务"
+else
+  echo -e "${Red}- 添加震动 Binder 兼容代理"
+  vibrator_source_pattern='<fqname>[[:space:]]*IVibrator/vibratorfeature[[:space:]]*</fqname>'
+  mapfile -t vibrator_source_manifests < <(sudo grep -rlE --include='*.xml' -- \
+    "$vibrator_source_pattern" "${vibrator_vintf_roots[@]}" 2>/dev/null)
+  vibrator_source_count=$(sudo grep -RhoE --include='*.xml' -- \
+    "$vibrator_source_pattern" "${vibrator_vintf_roots[@]}" 2>/dev/null | wc -l || true)
+  if [[ $vibrator_source_count -ne 1 || ${#vibrator_source_manifests[@]} -ne 1 ]]; then
+    echo -e "${Red}- 预期找到一个 IVibrator/vibratorfeature VINTF 声明，实际找到 ${vibrator_source_count} 个"
+    exit 1
+  fi
+
+  vibrator_alias_dir="$GITHUB_WORKSPACE"/tools/vibrator_alias
+  vibrator_alias_binary="$GITHUB_WORKSPACE"/images/vendor/bin/hw/vendor.vibrator-default-alias
+  if [[ ! -d "$GITHUB_WORKSPACE"/images/vendor/bin/hw || \
+    ! -d "$GITHUB_WORKSPACE"/images/vendor/etc/init || \
+    ! -f "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts || \
+    ! -f "$GITHUB_WORKSPACE"/images/config/vendor_fs_config ]]; then
+    echo -e "${Red}- 底包缺少震动兼容代理所需的 vendor 目录或元数据文件"
+    exit 1
+  fi
+  if ! sudo "$vibrator_alias_dir"/build.sh "$ANDROID_NDK" "$vibrator_alias_binary"; then
+    echo -e "${Red}- 震动 Binder 兼容代理编译失败"
+    exit 1
+  fi
+
+  if ! sudo cp -f "$vibrator_alias_dir"/vendor.vibrator-default-alias.rc \
+    "$GITHUB_WORKSPACE"/images/vendor/etc/init/; then
+    echo -e "${Red}- 震动 Binder 兼容代理 init 配置复制失败"
+    exit 1
+  fi
+  if ! sudo sed -Ei '/<fqname>[[:space:]]*IVibrator\/vibratorfeature[[:space:]]*<\/fqname>/a\        <fqname>IVibrator/default</fqname>' \
+    "${vibrator_source_manifests[0]}"; then
+    echo -e "${Red}- vibrator VINTF 清单修改失败"
+    exit 1
+  fi
+  vibrator_default_count=$(sudo grep -RhoE --include='*.xml' -- \
+    "$vibrator_default_pattern" "${vibrator_vintf_roots[@]}" 2>/dev/null | wc -l || true)
+  vibrator_source_count=$(sudo grep -RhoE --include='*.xml' -- \
+    "$vibrator_source_pattern" "${vibrator_vintf_roots[@]}" 2>/dev/null | wc -l || true)
+  if [[ $vibrator_default_count -ne 1 || $vibrator_source_count -ne 1 ]]; then
+    echo -e "${Red}- 修改后 VINTF 声明数量异常: default=${vibrator_default_count}, vibratorfeature=${vibrator_source_count}"
+    exit 1
+  fi
+  if ! sudo python3 -c 'import sys; from xml.etree import ElementTree as ET; ET.parse(sys.argv[1])' \
+    "${vibrator_source_manifests[0]}"; then
+    echo -e "${Red}- 修改后的 vibrator VINTF 清单不是合法 XML"
+    exit 1
+  fi
+
+  vibrator_vendor_sepolicy="$GITHUB_WORKSPACE"/images/vendor/etc/selinux/vendor_sepolicy.cil
+  if ! sudo python3 "$vibrator_alias_dir"/patch_vendor_sepolicy.py \
+    "$vibrator_vendor_sepolicy" \
+    "$vibrator_alias_dir"/vendor.vibrator-default-alias.cil \
+    "$GITHUB_WORKSPACE"/images/vendor/etc/selinux \
+    "$GITHUB_WORKSPACE"/images/odm/etc/selinux; then
+    echo -e "${Red}- 震动兼容代理 SELinux 策略注入失败"
+    exit 1
+  fi
+
+  append_vendor_metadata "/vendor/bin/hw/vendor\.vibrator-default-alias u:object_r:hal_vibrator_default_exec:s0" \
+    "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts || exit 1
+  append_vendor_metadata "vendor/bin/hw/vendor.vibrator-default-alias 0 2000 0755" \
+    "$GITHUB_WORKSPACE"/images/config/vendor_fs_config || exit 1
+  append_vendor_metadata "/vendor/etc/init/vendor\.vibrator-default-alias\.rc u:object_r:vendor_configs_file:s0" \
+    "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts || exit 1
+  append_vendor_metadata "vendor/etc/init/vendor.vibrator-default-alias.rc 0 0 0644" \
+    "$GITHUB_WORKSPACE"/images/config/vendor_fs_config || exit 1
+fi
+# 恢复 vendor SDK 32 Dolby AC-4 decoder 的私有初始化
+echo -e "${Red}- 添加 Dolby AC-4 OMX 兼容层"
+ac4_compat_dir="$GITHUB_WORKSPACE"/tools/ac4_compat
+ac4_vendor_root="$GITHUB_WORKSPACE"/images/vendor
+ac4_runtime_sdk=$(grep -m1 '^ro.build.version.sdk=' "$system_build_prop" | cut -d'=' -f2-)
+if [[ ! "$ac4_runtime_sdk" =~ ^[0-9]+$ ]]; then
+  echo -e "${Red}- 无法识别移植系统的 Android API: $ac4_runtime_sdk"
+  exit 1
+fi
+for ac4_metadata_file in \
+  "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts \
+  "$GITHUB_WORKSPACE"/images/config/vendor_fs_config; do
+  if [[ ! -f "$ac4_metadata_file" ]]; then
+    echo -e "${Red}- AC-4 兼容层缺少 vendor 元数据文件: $ac4_metadata_file"
+    exit 1
+  fi
+done
+if ! sudo bash "$ac4_compat_dir"/build.sh \
+  "$ANDROID_NDK" "$ac4_vendor_root" "$ac4_runtime_sdk" "$device"; then
+  echo -e "${Red}- Dolby AC-4 OMX 兼容层构建失败"
+  exit 1
+fi
+append_vendor_metadata \
+  "/vendor/lib/libstagefright_soft_ac4src\.so u:object_r:vendor_file:s0" \
+  "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts || exit 1
+append_vendor_metadata \
+  "vendor/lib/libstagefright_soft_ac4src.so 0 0 0644" \
+  "$GITHUB_WORKSPACE"/images/config/vendor_fs_config || exit 1
 echo "开始更换GPU驱动"
 mkdir -p "$GITHUB_WORKSPACE"/images
 \cp -rf "$GITHUB_WORKSPACE"/files/gpu_drivers/* "$GITHUB_WORKSPACE"/images/
