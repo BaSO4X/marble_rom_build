@@ -334,6 +334,25 @@ echo "/vendor/firmware/a740v3_sqe\.fw u:object_r:system_file:s0" | sudo tee -a "
 echo "vendor/firmware/a740v3_sqe.fw 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
 echo "/vendor/firmware/gen71100_sqe\.fw u:object_r:system_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
 echo "vendor/firmware/gen71100_sqe.fw 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+# Bluetooth Audio AIDL 服务
+echo "/vendor/bin/hw/android\.hardware\.bluetooth\.audio-service\.marble u:object_r:hal_audio_default_exec:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/bin/hw/android.hardware.bluetooth.audio-service.marble 0 2000 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/etc/init/android\.hardware\.bluetooth\.audio-service\.marble\.rc u:object_r:vendor_configs_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/etc/init/android.hardware.bluetooth.audio-service.marble.rc 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/etc/vintf/manifest/android\.hardware\.bluetooth\.audio-service\.marble\.xml u:object_r:vendor_configs_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/etc/vintf/manifest/android.hardware.bluetooth.audio-service.marble.xml 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib64/libbluetooth_audio_session\.so u:object_r:vendor_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/libbluetooth_audio_session.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/lib64/hw/audio\.bluetooth\.default\.so u:object_r:vendor_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib64/hw/audio.bluetooth.default.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+# 震动兼容代理
+echo "/vendor/bin/hw/vendor\.vibrator-default-alias u:object_r:hal_vibrator_default_exec:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/bin/hw/vendor.vibrator-default-alias 0 2000 0755" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+echo "/vendor/etc/init/vendor\.vibrator-default-alias\.rc u:object_r:vendor_configs_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/etc/init/vendor.vibrator-default-alias.rc 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+# Dolby AC-4 OMX 兼容层
+echo "/vendor/lib/libstagefright_soft_ac4src\.so u:object_r:vendor_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+echo "vendor/lib/libstagefright_soft_ac4src.so 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
 End_Time 功能修复
 ### 功能修复结束
 
