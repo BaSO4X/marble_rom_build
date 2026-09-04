@@ -125,8 +125,6 @@ for i in system_ext vendor mi_ext system product odm vendor_dlkm; do
   sudo $erofs_extract -i "$GITHUB_WORKSPACE"/Extra_dir/$i.img -x -s
   rm -rf "$GITHUB_WORKSPACE"/Extra_dir/$i.img
 done
-echo -e "${Red}- 下载recovery.img"
-curl -s https://api.github.com/repos/AviderMin/ofrp_device_xiaomi_marble/releases/latest | grep -o 'https://[^"]*\.img' | xargs -I {} aria2c -x16 -s16 -o recovery.img {} -d "${GITHUB_WORKSPACE}/firmware/images"
 # 去除 AVB2.0 校验
 echo -e "${Red}- 去除 AVB2.0 校验"
 "$GITHUB_WORKSPACE"/tools/vbmeta-disable-verification "$GITHUB_WORKSPACE"/firmware/images/vbmeta.img
