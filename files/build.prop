@@ -152,3 +152,7 @@ persist.sys.enhance_vkpipelinecache.enable=false
 ro.display.enable_pwm_switch=false
 #修复锁屏模糊闪退
 ro.hwui.use_vulkan=true
+#iorapd
+persist.iorapd.log.verbose=false
+persist.sys.stability.PrereadEnable=false
+persist.sys.stability.PtePrereadEnable=false
