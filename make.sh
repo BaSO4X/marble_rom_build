@@ -211,6 +211,17 @@ mkdir -p "$GITHUB_WORKSPACE"/images
 \cp -rf "$GITHUB_WORKSPACE"/files/common/* "$GITHUB_WORKSPACE"/images/
 echo "处理build.prop"
 cat "$GITHUB_WORKSPACE"/files/build.prop >> "$GITHUB_WORKSPACE"/images/mi_ext/etc/build.prop
+#为6.7版本相机添加START_TASKS_FROM_RECENTS权限
+echo -e "${Red}- 开始为6.7版本相机添加START_TASKS_FROM_RECENTS权限${NC}"
+privapp_xml="$GITHUB_WORKSPACE"/images/product/etc/permissions/privapp-permissions-product.xml
+if [ -f "$privapp_xml" ] && ! sed -n '/<privapp-permissions package="com.android.camera">/,/<\/privapp-permissions>/p' "$privapp_xml" | grep -qF 'START_TASKS_FROM_RECENTS'; then
+    sed -i '/<privapp-permissions package="com.android.camera">/,/<\/privapp-permissions>/{
+        /<\/privapp-permissions>/i\      <permission name="android.permission.START_TASKS_FROM_RECENTS" />
+    }' "$privapp_xml"
+    echo -e "${Green}- 已为6.7版本相机添加START_TASKS_FROM_RECENTS权限${NC}"
+else
+    echo -e "${Yellow}- 跳过: XML文件不存在或START_TASKS_FROM_RECENTS权限已存在${NC}"
+fi
 curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*com\.android\.vndk\.v30\.apex' | xargs -I {} aria2c -x16 -s16 -o com.android.vndk.v30.apex {} -d "${GITHUB_WORKSPACE}/images/system_ext/apex"
 curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*MiuiCamera\.apk' | xargs -I {} aria2c -x16 -s16 -o MiuiCamera.apk {} -d "${GITHUB_WORKSPACE}/images/product/priv-app/MiuiCamera"
 echo "开始添加selinux策略"

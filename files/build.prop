@@ -156,3 +156,5 @@ ro.hwui.use_vulkan=true
 persist.iorapd.log.verbose=false
 persist.sys.stability.PrereadEnable=false
 persist.sys.stability.PtePrereadEnable=false
+#自定义唤醒词
+ro.vendor.audio.soundtrigger.wakeupword=2
