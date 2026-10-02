@@ -1,0 +1,13 @@
+{
+  "api" : "framework",
+  "name" : "framework_compat",
+  "version" : 9,
+  "plugin" : {
+    "id" : "framework_compat",
+    "version" : 5,
+    "entry" : "com.xiaomi.taiyi.plugin.framework.FrameworkPlugin"
+  },
+  "isLLM" : false,
+  "disabled" : false,
+  "type" : 0
+}

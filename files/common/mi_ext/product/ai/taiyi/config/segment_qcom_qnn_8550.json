@@ -1,0 +1,19 @@
+{
+  "parent" : "qcom_qnn_v2_36_0_v73",
+  "api" : "segment",
+  "name" : "segment_qcom_qnn_8550",
+  "version" : 5,
+  "models" : [ {
+    "id" : "segment_model_qcom_qnn",
+    "version" : 1,
+    "required" : true
+  } ],
+  "plugin" : {
+    "id" : "segment_v3_npu",
+    "version" : 3,
+    "entry" : "com.xiaomi.taiyi.plugin.segment.SegmentPlugin"
+  },
+  "isLLM" : false,
+  "disabled" : false,
+  "type" : 0
+}

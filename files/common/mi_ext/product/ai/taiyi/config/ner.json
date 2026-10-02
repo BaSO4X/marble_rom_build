@@ -1,0 +1,13 @@
+{
+  "api" : "ner",
+  "name" : "ner",
+  "version" : 1,
+  "plugin" : {
+    "id" : "ner",
+    "version" : 1,
+    "entry" : "com.xiaomi.taiyi.plugin.ner.NerPlugin"
+  },
+  "isLLM" : false,
+  "disabled" : false,
+  "type" : 0
+}

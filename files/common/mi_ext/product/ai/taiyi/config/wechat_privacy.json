@@ -1,0 +1,13 @@
+{
+  "api" : "wechat_privacy",
+  "name" : "wechat_privacy",
+  "version" : 5,
+  "plugin" : {
+    "id" : "wechat_privacy",
+    "version" : 2,
+    "entry" : "com.xiaomi.taiyi.plugin.wechatprivacy.WechatPrivacyPlugin"
+  },
+  "isLLM" : false,
+  "disabled" : false,
+  "type" : 0
+}
