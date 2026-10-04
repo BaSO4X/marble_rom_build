@@ -227,17 +227,6 @@ fi
 # 下载大文件
 curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*com\.android\.vndk\.v30\.apex' | xargs -I {} aria2c -x16 -s16 -o com.android.vndk.v30.apex {} -d "${GITHUB_WORKSPACE}/images/system_ext/apex"
 curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/12t | grep -o 'https://[^"]*MiuiCamera\.apk' | xargs -I {} aria2c -x16 -s16 -o MiuiCamera.apk {} -d "${GITHUB_WORKSPACE}/images/product/priv-app/MiuiCamera"
-# 开机 restorecon 跳过 /data/adb 子项: KSU 模块文件的标签 init 改不回, 有一处失败就不写回
-echo -e "${Red}- 开机 restorecon 跳过 /data/adb"
-plat_file_contexts="$GITHUB_WORKSPACE"/images/system/system/etc/selinux/plat_file_contexts
-if ! sudo grep -q '^/data/adb/\.\*[[:space:]]\+<<none>>$' "$plat_file_contexts"; then
-  if ! sudo grep -q '^/data/adb(/\.\*)?[[:space:]]\+u:object_r:adb_data_file:s0$' "$plat_file_contexts"; then
-    echo -e "${Red}- plat_file_contexts 里没有 /data/adb 规则"
-    exit 1
-  fi
-  sudo sed -i 's#^/data/adb(/\.\*)?\([[:space:]]\+\)u:object_r:adb_data_file:s0$#/data/adb\1u:object_r:adb_data_file:s0\n/data/adb/.*\1<<none>>#' \
-    "$plat_file_contexts" || exit 1
-fi
 # 添加selinux策略
 echo "开始添加selinux策略"
 echo "(allow hal_audio_default hal_audio_default (binder (call transfer)))" | sudo tee -a "$GITHUB_WORKSPACE"/images/vendor/etc/selinux/vendor_sepolicy.cil
