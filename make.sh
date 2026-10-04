@@ -173,6 +173,7 @@ echo "incremental_version=$incremental_version" >>$GITHUB_ENV
 ### 功能修复
 echo -e "${Red}- 开始功能修复"
 Start_Time
+# 精简apk
 echo "精简apk"
 rm -rf "$GITHUB_WORKSPACE"/images/product/app/AnalyticsCore
 rm -rf "$GITHUB_WORKSPACE"/images/product/app/BSGameCenter
@@ -206,6 +207,7 @@ rm -rf "$GITHUB_WORKSPACE"/images/product/pangu/system/app/Nfc_st
 rm -rf "$GITHUB_WORKSPACE"/images/mi_ext/product/ai/taiyi
 echo "精简apk完成"
 echo "当前机型为 $model"
+# 替换文件
 echo "正在复制文件..."
 mkdir -p "$GITHUB_WORKSPACE"/images
 \cp -rf "$GITHUB_WORKSPACE"/files/common/* "$GITHUB_WORKSPACE"/images/
@@ -222,14 +224,17 @@ if [ -f "$privapp_xml" ] && ! sed -n '/<privapp-permissions package="com.android
 else
     echo -e "${Yellow}- 跳过: XML文件不存在或START_TASKS_FROM_RECENTS权限已存在${NC}"
 fi
+# 下载大文件
 curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*com\.android\.vndk\.v30\.apex' | xargs -I {} aria2c -x16 -s16 -o com.android.vndk.v30.apex {} -d "${GITHUB_WORKSPACE}/images/system_ext/apex"
 curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/12t | grep -o 'https://[^"]*MiuiCamera\.apk' | xargs -I {} aria2c -x16 -s16 -o MiuiCamera.apk {} -d "${GITHUB_WORKSPACE}/images/product/priv-app/MiuiCamera"
+# 添加selinux策略
 echo "开始添加selinux策略"
 echo "(allow hal_audio_default hal_audio_default (binder (call transfer)))" | sudo tee -a "$GITHUB_WORKSPACE"/images/vendor/etc/selinux/vendor_sepolicy.cil
 echo "(allow init system_lib_file (file (mounton)))" | sudo tee -a "$GITHUB_WORKSPACE"/images/vendor/etc/selinux/vendor_sepolicy.cil
 echo "(allow hal_vibrator_default hal_vibrator_default (binder (call transfer)))" | sudo tee -a "$GITHUB_WORKSPACE"/images/vendor/etc/selinux/vendor_sepolicy.cil
 # VkPipelineCache正确生成缓存
 echo "(allow graphicsengine hwservicemanager_prop (file (read getattr map open)))" | sudo tee -a "$GITHUB_WORKSPACE"/images/system_ext/etc/selinux/system_ext_sepolicy.cil
+# 更换GPU驱动
 echo "开始更换GPU驱动"
 mkdir -p "$GITHUB_WORKSPACE"/images
 \cp -rf "$GITHUB_WORKSPACE"/files/gpu_drivers/* "$GITHUB_WORKSPACE"/images/
