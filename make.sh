@@ -4,6 +4,8 @@ URL="$1"              # 移植包下载地址
 VENDOR_URL="$2"       # 底包下载地址
 GITHUB_ENV="$3"       # 输出环境变量
 GITHUB_WORKSPACE="$4" # 工作目录
+ANDROID_NDK="${5:-}"  # Android NDK 路径
+CARGO="${6:-cargo}"   # Rust Cargo 路径
 
 Red='\033[1;31m'    # 粗体红色
 Yellow='\033[1;33m' # 粗体黄色
