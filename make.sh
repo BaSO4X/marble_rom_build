@@ -81,6 +81,14 @@ End_Time() {
   fi
 }
 
+append_vendor_metadata() {
+  local metadata_line="$1"
+  local metadata_file="$2"
+  if ! sudo grep -Fqx "$metadata_line" "$metadata_file"; then
+    printf '%s\n' "$metadata_line" | sudo tee -a "$metadata_file" >/dev/null || return 1
+  fi
+}
+
 ### 系统包下载
 echo -e "${Red}- 开始下载系统包"
 Start_Time
