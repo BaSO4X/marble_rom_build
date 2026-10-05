@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "profiles": [
+    {
+      "id": "marble-vendor32-41551d",
+      "device": "marble",
+      "vendor_sdk": 32,
+      "runtime_sdk_min": 35,
+      "runtime_sdk_max": null,
+      "decoder_path": "lib/libstagefright_soft_ac4dec.so",
+      "renamed_path": "lib/libstagefright_soft_ac4src.so",
+      "xml_path": "etc/media_codecs_dolby_audio.xml",
+      "source_sha256": "41551d9572d33fcc94ef7e80621ce635562d60b20fe37f575fb9bf776e6e14cf",
+      "renamed_sha256": "65e91d891eccb98aeff48ffc16d186d18c94191933d2f04806a4d2bedc610be7",
+      "source_soname": "libstagefright_soft_ac4dec.so",
+      "target_soname": "libstagefright_soft_ac4src.so",
+      "soname_offset": 160361,
+      "private_abi": "splitsec-v1",
+      "table_id": "marble-splitsec-tables-v1",
+      "wrapper_sha256": "aaf1aa98553fd7ad5c50500bad8530fba934dc3c28732b25e990ae5fe5e28e10"
+    }
+  ]
+}

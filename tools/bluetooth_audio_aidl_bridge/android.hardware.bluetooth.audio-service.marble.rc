@@ -1,0 +1,5 @@
+service vendor.bluetooth-audio-aidl-bridge /vendor/bin/hw/android.hardware.bluetooth.audio-service.marble
+    interface aidl android.hardware.bluetooth.audio.IBluetoothAudioProviderFactory/default
+    class hal
+    user audioserver
+    group audio bluetooth

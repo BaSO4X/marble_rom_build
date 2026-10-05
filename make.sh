@@ -350,6 +350,104 @@ echo "/vendor/firmware/a740v3_sqe\.fw u:object_r:system_file:s0" | sudo tee -a "
 echo "vendor/firmware/a740v3_sqe.fw 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
 echo "/vendor/firmware/gen71100_sqe\.fw u:object_r:system_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
 echo "vendor/firmware/gen71100_sqe.fw 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
+# 将底包的 legacy Consumer IR 模块接入 Android 17 AIDL framework
+echo -e "${Red}- 添加 Consumer IR AIDL 适配服务"
+consumer_ir_dir="$GITHUB_WORKSPACE"/tools/consumer_ir_aidl
+consumer_ir_binary="$GITHUB_WORKSPACE"/images/vendor/bin/hw/android.hardware.ir@1.0-service
+consumer_ir_rc="$GITHUB_WORKSPACE"/images/vendor/etc/init/android.hardware.ir@1.0-service.rc
+consumer_ir_manifest=$(sudo find \
+  "$GITHUB_WORKSPACE"/images/vendor/etc/vintf \
+  "$GITHUB_WORKSPACE"/images/odm/etc/vintf \
+  -maxdepth 1 -type f -name "manifest_${device}.xml" -print -quit)
+if ! sudo "$consumer_ir_dir"/build.sh "$ANDROID_NDK" "$consumer_ir_binary"; then
+  echo -e "${Red}- Consumer IR AIDL 服务编译失败"
+  exit 1
+fi
+if ! sudo cp -f "$consumer_ir_dir"/android.hardware.ir-service.marble.rc "$consumer_ir_rc"; then
+  echo -e "${Red}- Consumer IR AIDL init 配置替换失败"
+  exit 1
+fi
+if ! sudo python3 "$consumer_ir_dir"/update_vintf.py "$consumer_ir_manifest"; then
+  echo -e "${Red}- Consumer IR VINTF 清单更新失败"
+  exit 1
+fi
+# 从源码构建 marble/VNDK 32 Bluetooth Audio profile 并接入正式镜像。
+echo -e "${Red}- 添加 Bluetooth Audio AIDL 适配"
+bluetooth_audio_rom_dir="$GITHUB_WORKSPACE"/tools/bluetooth_audio_aidl_bridge/rom_integration
+if ! sudo bash "$bluetooth_audio_rom_dir"/build_and_install.sh \
+  "$ANDROID_NDK" \
+  "$CARGO" \
+  "$a7z" \
+  "$GITHUB_WORKSPACE"/images \
+  "$GITHUB_WORKSPACE"/images/system/system \
+  "$GITHUB_WORKSPACE"/images/config \
+  "$device"; then
+  echo -e "${Red}- Bluetooth Audio AIDL 正式镜像接入失败"
+  exit 1
+fi
+# 为 Android framework 提供 IVibrator/default 兼容代理
+echo -e "${Red}- 添加震动 Binder 兼容代理"
+# 固定底包仅提供 vibratorfeature，直接补入 default 代理。
+vibrator_source_manifest=$(sudo grep -rlE --include='*.xml' -- \
+  '<fqname>[[:space:]]*IVibrator/vibratorfeature[[:space:]]*</fqname>' \
+  "$GITHUB_WORKSPACE"/images/vendor/etc/vintf \
+  "$GITHUB_WORKSPACE"/images/odm/etc/vintf)
+vibrator_alias_dir="$GITHUB_WORKSPACE"/tools/vibrator_alias
+vibrator_alias_binary="$GITHUB_WORKSPACE"/images/vendor/bin/hw/vendor.vibrator-default-alias
+if ! sudo "$vibrator_alias_dir"/build.sh "$ANDROID_NDK" "$vibrator_alias_binary"; then
+  echo -e "${Red}- 震动 Binder 兼容代理编译失败"
+  exit 1
+fi
+
+if ! sudo cp -f "$vibrator_alias_dir"/vendor.vibrator-default-alias.rc \
+  "$GITHUB_WORKSPACE"/images/vendor/etc/init/; then
+  echo -e "${Red}- 震动 Binder 兼容代理 init 配置复制失败"
+  exit 1
+fi
+if ! sudo sed -Ei '/<fqname>[[:space:]]*IVibrator\/vibratorfeature[[:space:]]*<\/fqname>/a\        <fqname>IVibrator/default</fqname>' \
+  "$vibrator_source_manifest"; then
+  echo -e "${Red}- vibrator VINTF 清单修改失败"
+  exit 1
+fi
+
+vibrator_vendor_sepolicy="$GITHUB_WORKSPACE"/images/vendor/etc/selinux/vendor_sepolicy.cil
+if ! sudo python3 "$vibrator_alias_dir"/patch_vendor_sepolicy.py \
+  "$vibrator_vendor_sepolicy" \
+  "$vibrator_alias_dir"/vendor.vibrator-default-alias.cil \
+  "$GITHUB_WORKSPACE"/images/vendor/etc/selinux \
+  "$GITHUB_WORKSPACE"/images/odm/etc/selinux; then
+  echo -e "${Red}- 震动兼容代理 SELinux 策略注入失败"
+  exit 1
+fi
+
+append_vendor_metadata "/vendor/bin/hw/vendor\.vibrator-default-alias u:object_r:hal_vibrator_default_exec:s0" \
+  "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts || exit 1
+append_vendor_metadata "vendor/bin/hw/vendor.vibrator-default-alias 0 2000 0755" \
+  "$GITHUB_WORKSPACE"/images/config/vendor_fs_config || exit 1
+append_vendor_metadata "/vendor/etc/init/vendor\.vibrator-default-alias\.rc u:object_r:vendor_configs_file:s0" \
+  "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts || exit 1
+append_vendor_metadata "vendor/etc/init/vendor.vibrator-default-alias.rc 0 0 0644" \
+  "$GITHUB_WORKSPACE"/images/config/vendor_fs_config || exit 1
+# 恢复 vendor SDK 32 Dolby AC-4 decoder 的私有初始化
+echo -e "${Red}- 添加 Dolby AC-4 OMX 兼容层"
+ac4_compat_dir="$GITHUB_WORKSPACE"/tools/ac4_compat
+ac4_vendor_root="$GITHUB_WORKSPACE"/images/vendor
+ac4_runtime_sdk=$(grep -m1 '^ro.build.version.sdk=' "$system_build_prop" | cut -d'=' -f2-)
+if [[ ! "$ac4_runtime_sdk" =~ ^[0-9]+$ ]]; then
+  echo -e "${Red}- 无法识别移植系统的 Android API: $ac4_runtime_sdk"
+  exit 1
+fi
+if ! sudo bash "$ac4_compat_dir"/build.sh \
+  "$ANDROID_NDK" "$ac4_vendor_root" "$ac4_runtime_sdk" "$device"; then
+  echo -e "${Red}- Dolby AC-4 OMX 兼容层构建失败"
+  exit 1
+fi
+append_vendor_metadata \
+  "/vendor/lib/libstagefright_soft_ac4src\.so u:object_r:vendor_file:s0" \
+  "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts || exit 1
+append_vendor_metadata \
+  "vendor/lib/libstagefright_soft_ac4src.so 0 0 0644" \
+  "$GITHUB_WORKSPACE"/images/config/vendor_fs_config || exit 1
 End_Time 功能修复
 ### 功能修复结束
 
