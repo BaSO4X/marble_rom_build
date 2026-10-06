@@ -234,6 +234,15 @@ if [ -f "$privapp_xml" ] && ! sed -n '/<privapp-permissions package="com.android
 else
     echo -e "${Yellow}- 跳过: XML文件不存在或START_TASKS_FROM_RECENTS权限已存在${NC}"
 fi
+#关闭AI键快捷方式
+echo -e "${Red}- 开始关闭AI键快捷方式${NC}"
+device_features_xml="$GITHUB_WORKSPACE"/images/mi_ext/product/etc/cust_features/device_features.xml
+if [ -f "$device_features_xml" ] && grep -qF '<bool name="input_shortcut_support_ai_key">true</bool>' "$device_features_xml"; then
+    sed -i 's#<bool name="input_shortcut_support_ai_key">true</bool>#<bool name="input_shortcut_support_ai_key">false</bool>#' "$device_features_xml"
+    echo -e "${Green}- 已将input_shortcut_support_ai_key设置为false${NC}"
+else
+    echo -e "${Yellow}- 跳过: 未找到相关内容${NC}"
+fi
 # 下载大文件
 curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/backup | grep -o 'https://[^"]*com\.android\.vndk\.v30\.apex' | xargs -I {} aria2c -x16 -s16 -o com.android.vndk.v30.apex {} -d "${GITHUB_WORKSPACE}/images/system_ext/apex"
 curl -s https://api.github.com/repos/BaSO4X/Backup/releases/tags/12t | grep -o 'https://[^"]*MiuiCamera\.apk' | xargs -I {} aria2c -x16 -s16 -o MiuiCamera.apk {} -d "${GITHUB_WORKSPACE}/images/product/priv-app/MiuiCamera"
