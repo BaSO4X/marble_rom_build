@@ -156,3 +156,5 @@ persist.sys.stability.PrereadEnable=false
 persist.sys.stability.PtePrereadEnable=false
 #自定义唤醒词
 ro.vendor.audio.soundtrigger.wakeupword=2
+#智能防窥
+ro.sf.support_privacy_shield=false
