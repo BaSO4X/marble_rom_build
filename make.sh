@@ -230,6 +230,22 @@ echo "vendor/lib64/egl/libVkLayer_ADRENO_qprofiler.so 0 0 0644" | sudo tee -a "$
 echo "/vendor/lib64/egl/libVkLayer_ADRENO_qprofiler\.so u:object_r:system_lib_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
 echo "vendor/firmware/a650_sqe.fw 0 0 0644" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_fs_config
 echo "/vendor/firmware/a650_sqe\.fw u:object_r:system_file:s0" | sudo tee -a "$GITHUB_WORKSPACE"/images/config/vendor_file_contexts
+# 添加selinux策略
+echo "开始添加selinux策略"
+echo "(allow hal_audio_default hal_audio_default (binder (call transfer)))" | sudo tee -a "$GITHUB_WORKSPACE"/images/vendor/etc/selinux/vendor_sepolicy.cil
+echo "(allow init system_lib_file (file (mounton)))" | sudo tee -a "$GITHUB_WORKSPACE"/images/vendor/etc/selinux/vendor_sepolicy.cil
+echo "(allow hal_vibrator_default hal_vibrator_default (binder (call transfer)))" | sudo tee -a "$GITHUB_WORKSPACE"/images/vendor/etc/selinux/vendor_sepolicy.cil
+echo "(allow shell vendor_sysfs_qcom_battery (dir (search)))" | sudo tee -a "$GITHUB_WORKSPACE"/images/vendor/etc/selinux/vendor_sepolicy.cil
+echo "(allow init vendor_sysfs_qcom_battery (file (open setattr write)))" | sudo tee -a "$GITHUB_WORKSPACE"/images/vendor/etc/selinux/vendor_sepolicy.cil
+# 开机后将 qcom-battery 的 fake_cycle 写为 1
+echo "开始修改 init.rc"
+init_rc="$GITHUB_WORKSPACE"/images/system/system/etc/init/hw/init.rc
+[ -f "$init_rc" ] || { echo -e "${Red}- 未找到 $init_rc"; exit 1; }
+echo "" | sudo tee -a "$init_rc"
+echo "on property:sys.boot_completed=1" | sudo tee -a "$init_rc"
+echo "    chmod 0664 /sys/class/qcom-battery/fake_cycle" | sudo tee -a "$init_rc"
+echo "    chown system system /sys/class/qcom-battery/fake_cycle" | sudo tee -a "$init_rc"
+echo "    write /sys/class/qcom-battery/fake_cycle 1" | sudo tee -a "$init_rc"
 End_Time 功能修复
 ### 功能修复结束
 
