@@ -462,6 +462,21 @@ append_vendor_metadata \
 append_vendor_metadata \
   "vendor/lib/libstagefright_soft_ac4src.so 0 0 0644" \
   "$GITHUB_WORKSPACE"/images/config/vendor_fs_config || exit 1
+# 关闭 GPU 抢占: 桌面 VK 上下文的 GPU hang 都出在抢占用的低优先级 RB 上
+echo -e "${Red}- 关闭 GPU 抢占"
+post_boot="$GITHUB_WORKSPACE"/images/vendor/bin/init.qcom.post_boot.sh
+if [[ ! -f "$post_boot" ]]; then
+  echo -e "${Red}- 缺少 vendor/bin/init.qcom.post_boot.sh"
+  exit 1
+fi
+if ! sudo grep -q 'kgsl-3d0/preemption' "$post_boot"; then
+  sudo tee -a "$post_boot" >/dev/null <<'EOF' || exit 1
+
+if [ -f /sys/class/kgsl/kgsl-3d0/preemption ]; then
+  echo 0 > /sys/class/kgsl/kgsl-3d0/preemption
+fi
+EOF
+fi
 End_Time 功能修复
 ### 功能修复结束
 
