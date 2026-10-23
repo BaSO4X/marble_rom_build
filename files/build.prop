@@ -103,12 +103,15 @@ persist.sys.smartpower.display_camera_fps_enable=true
 bluetooth.profile.asha.central.enabled=true
 persist.sys.adoptable=force_off
 #锁帧修复
-ro.surface_flinger.use_content_detection_for_refresh_rate=true
+debug.sf.set_idle_timer_ms=2147483647
 ro.surface_flinger.set_idle_timer_ms=2147483647
 ro.surface_flinger.set_touch_timer_ms=2147483647
 ro.surface_flinger.set_display_power_timer_ms=2147483647
-ro.vendor.display.idle_default_fps=120
+ro.surface_flinger.use_content_detection=false
 ro.vendor.display.default_fps=120
+ro.vendor.display.idle_default_fps=120
+ro.vendor.display.ai_disp.enable=false
+ro.vendor.display.touch.idle.enable=false
 #游戏音质优化
 ro.vendor.audio.game.effect=true
 #扬声器清理
