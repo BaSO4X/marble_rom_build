@@ -108,6 +108,7 @@ ro.surface_flinger.set_idle_timer_ms=2147483647
 ro.surface_flinger.set_touch_timer_ms=2147483647
 ro.surface_flinger.set_display_power_timer_ms=2147483647
 ro.vendor.display.idle_default_fps=120
+ro.vendor.display.default_fps=120
 #游戏音质优化
 ro.vendor.audio.game.effect=true
 #扬声器清理
