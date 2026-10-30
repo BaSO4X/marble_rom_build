@@ -831,6 +831,12 @@
     <!-- Whether rhythmic mode 2.0 supported by phone -->
     <bool name="is_rhythmic_mode_v2_supported">true</bool> 
 <!-- Redmi Note 12 Turbo Patch END -->
+    <!-- Whether night wakeup mode setting is supported -->
+    <bool name="support_night_wakeup_mode_setting">true</bool>
+    <!-- Whether to enable the eyecare wave render effect -->
+    <bool name="enable_eyecare_wave_render">true</bool>
+    <!-- Whether the blue light spectrum can be read from hardware sensor -->
+    <bool name="support_blue_spectrum_hardware_read">true</bool>
 </features>
 <!-- END Patch-->
 
